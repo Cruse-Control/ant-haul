@@ -1,0 +1,35 @@
+{
+  "id": "seed-storage",
+  "name": "Seed Storage",
+  "description": "Discord-first knowledge graph: ingests Discord messages and linked content into Neo4j via Graphiti for entity extraction and semantic search.",
+  "type": "daemon",
+  "owner": "wyler-zahm",
+  "author": "wyler-zahm",
+  "version": "1.0.0",
+  "enabled": true,
+  "source": {
+    "type": "git",
+    "repo": "https://github.com/Cruse-Control/seed-storage.git",
+    "ref": "main"
+  },
+  "entry_point": "/usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf",
+  "health_check_port": 8080,
+  "health_check_path": "/health",
+  "credentials": {
+    "openai": "OPENAI_API_KEY",
+    "discord-bot-seed-storage": "DISCORD_BOT_TOKEN_PATH",
+    "neo4j-seed-storage": "NEO4J_PASSWORD_PATH",
+    "github-pat": "GITHUB_TOKEN",
+    "discord-alerts-webhook": "DISCORD_ALERTS_WEBHOOK_PATH"
+  },
+  "resources": {
+    "requests": {
+      "cpu": "1",
+      "memory": "3Gi"
+    },
+    "limits": {
+      "cpu": "2",
+      "memory": "6Gi"
+    }
+  }
+}

@@ -1,0 +1,51 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.egg
+*.egg-info/
+dist/
+build/
+*.so
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Whisper model cache (large, re-downloaded on build)
+~/.cache/whisper/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Logs
+*.log
+logs/

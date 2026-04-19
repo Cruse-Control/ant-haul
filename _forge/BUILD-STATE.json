@@ -1,0 +1,1570 @@
+{
+  "run_id": "forge-20260418-seed-v2",
+  "target": "/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge",
+  "branch": "feat/v2-rebuild",
+  "status": "in_progress",
+  "current_iteration": 8,
+  "iterations": [
+    {
+      "iteration": 0,
+      "agent_results": [
+        {
+          "name": "types-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 103.63288831710815
+        },
+        {
+          "name": "config-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 666.6398274898529
+        },
+        {
+          "name": "infra-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 240.51452708244324
+        },
+        {
+          "name": "redis-utils-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 342.9853961467743
+        },
+        {
+          "name": "resolvers-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 401.20143032073975
+        },
+        {
+          "name": "graphiti-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 230.13191151618958
+        },
+        {
+          "name": "frontier-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 266.05069231987
+        },
+        {
+          "name": "ingestion-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 365.6898274421692
+        },
+        {
+          "name": "alerts-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 368.57140374183655
+        },
+        {
+          "name": "health-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 631.3437526226044
+        },
+        {
+          "name": "worker-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 340.5179560184479
+        },
+        {
+          "name": "integration-test-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 561.3040006160736
+        },
+        {
+          "name": "docs-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 298.81667041778564
+        }
+      ],
+      "eval_passed": false,
+      "eval_report": {
+        "passed": false,
+        "tests": {
+          "total": 280,
+          "passed": 279,
+          "failed": 1,
+          "errors": 0,
+          "output": "8: RuntimeWarning: coroutine '_resolve_urls' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCircuitBreaker::test_open_circuit_breaker_skips_ingest\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine 'ContentDispatcher.dispatch' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeEmptyResolved::test_empty_resolved_contents_writes_message_episode\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeEmptyResolved::test_empty_resolved_contents_writes_message_episode\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_add_episode' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/unit/test_graphiti_client.py::TestLLMProviderBranching::test_anthropic_provider_returns_anthropic_client\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 279 passed, 7 warnings in 3.46s\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_add_episode' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n"
+        },
+        "imports": {
+          "ok": [
+            "seed_storage.enrichment.models",
+            "seed_storage.config",
+            "seed_storage.dedup",
+            "seed_storage.circuit_breaker",
+            "seed_storage.cost_tracking",
+            "seed_storage.rate_limiting",
+            "seed_storage.notifications",
+            "seed_storage.graphiti_client",
+            "seed_storage.health",
+            "seed_storage.enrichment.dispatcher",
+            "seed_storage.expansion.frontier",
+            "seed_storage.ingestion.bot",
+            "seed_storage.ingestion.batch",
+            "seed_storage.worker.app",
+            "seed_storage.worker.tasks",
+            "seed_storage.worker.dead_letters"
+          ],
+          "failed": []
+        },
+        "conventions": {
+          "violations": [
+            "HARDCODED_KEYS: seed_storage/worker/dead_letters.py:29:    re.compile(r\"sk-ant-[A-Za-z0-9\\-_]{20,}\"),\nseed_storage/config.py:230:    re.compile(r\"sk-ant-[A-Za-z0-9\\-_]{20,}\"),    # Anthropic keys"
+          ]
+        }
+      },
+      "constraints": [
+        "FIX TEST: FAILED tests/unit/test_graphiti_client.py::TestLLMProviderBranching::test_anthropic_provider_returns_anthropic_client",
+        "FIX CONVENTION: HARDCODED_KEYS: seed_storage/worker/dead_letters.py:29:    re.compile(r\"sk-ant-[A-Za-z0-9\\-_]{20,}\"),\nseed_storage/config.py:230:    re.compile(r\"sk-a"
+      ],
+      "started_at": "2026-04-18T09:09:34.469649+00:00",
+      "finished_at": "2026-04-18T10:30:01.111147+00:00"
+    },
+    {
+      "iteration": 1,
+      "agent_results": [
+        {
+          "name": "types-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 9.070342063903809
+        },
+        {
+          "name": "config-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 322.4322190284729
+        },
+        {
+          "name": "infra-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 145.54738688468933
+        },
+        {
+          "name": "redis-utils-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 153.97391533851624
+        },
+        {
+          "name": "resolvers-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 120.12199115753174
+        },
+        {
+          "name": "graphiti-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 87.4748146533966
+        },
+        {
+          "name": "frontier-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 53.85939002037048
+        },
+        {
+          "name": "ingestion-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 128.4812297821045
+        },
+        {
+          "name": "alerts-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 108.11232590675354
+        },
+        {
+          "name": "health-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 95.87848019599915
+        },
+        {
+          "name": "worker-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 137.27202725410461
+        },
+        {
+          "name": "integration-test-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 502.654748916626
+        },
+        {
+          "name": "docs-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 116.82741785049438
+        }
+      ],
+      "eval_passed": true,
+      "eval_report": {
+        "passed": true,
+        "tests": {
+          "total": 390,
+          "passed": 390,
+          "failed": 0,
+          "errors": 0,
+          "output": "for more info.\n\ntests/unit/tasks/test_enrich_message.py::TestEnrichMessageReactionEvents::test_reactions_published_to_redis\n  /usr/lib/python3.12/unittest/mock.py:2129: RuntimeWarning: coroutine '_resolve_urls' was never awaited\n    if getattr(self, \"_mock_methods\", None) is not None:\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeBudgetCheck::test_budget_exceeded_triggers_retry\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine 'ContentDispatcher.dispatch' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCostTracking::test_cost_incremented_per_episode\ntests/unit/test_circuit_breaker.py::test_record_success_deletes_both_keys\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCostTracking::test_cost_incremented_per_episode\ntests/unit/test_circuit_breaker.py::test_record_success_deletes_both_keys\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_add_episode' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n390 passed, 10 warnings in 1.39s\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_add_episode' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n"
+        },
+        "imports": {
+          "ok": [
+            "seed_storage.enrichment.models",
+            "seed_storage.config",
+            "seed_storage.dedup",
+            "seed_storage.circuit_breaker",
+            "seed_storage.cost_tracking",
+            "seed_storage.rate_limiting",
+            "seed_storage.notifications",
+            "seed_storage.graphiti_client",
+            "seed_storage.health",
+            "seed_storage.enrichment.dispatcher",
+            "seed_storage.expansion.frontier",
+            "seed_storage.ingestion.bot",
+            "seed_storage.ingestion.batch",
+            "seed_storage.worker.app",
+            "seed_storage.worker.tasks",
+            "seed_storage.worker.dead_letters"
+          ],
+          "failed": []
+        },
+        "conventions": {
+          "violations": []
+        },
+        "production": {
+          "passed": false,
+          "deploy": {
+            "success": false,
+            "error": "Failed to trigger: None"
+          },
+          "integration": {
+            "total": 19,
+            "passed": 19,
+            "failed": 0,
+            "output": "ollected 27 items\n\ntests/integration/test_celery_tasks.py::test_enrich_end_to_end PASSED    [  3%]\ntests/integration/test_celery_tasks.py::test_ingest_writes_episode PASSED [  7%]\ntests/integration/test_celery_tasks.py::test_retry_on_transient_error PASSED [ 11%]\ntests/integration/test_celery_tasks.py::test_dead_letter_after_max_retries PASSED [ 14%]\ntests/integration/test_celery_tasks.py::test_reject_on_worker_lost_config PASSED [ 18%]\ntests/integration/test_celery_tasks.py::test_expand_task PASSED          [ 22%]\ntests/integration/test_celery_tasks.py::test_beat_fires_configuration PASSED [ 25%]\ntests/integration/test_celery_tasks.py::test_queue_routing PASSED        [ 29%]\ntests/integration/test_circuit_breaker_redis.py::test_cross_worker_state_shared PASSED [ 33%]\ntests/integration/test_circuit_breaker_redis.py::test_concurrent_failures_accumulate PASSED [ 37%]\ntests/integration/test_circuit_breaker_redis.py::test_cooldown_timing PASSED [ 40%]\ntests/integration/test_circuit_breaker_redis.py::test_reconnect_recovery PASSED [ 44%]\ntests/integration/test_circuit_breaker_redis.py::test_keys_listing PASSED [ 48%]\ntests/integration/test_dedup_redis.py::test_sadd_sismember_basic PASSED  [ 51%]\ntests/integration/test_dedup_redis.py::test_concurrent_access PASSED     [ 55%]\ntests/integration/test_dedup_redis.py::test_seen_or_mark_atomicity PASSED [ 59%]\ntests/integration/test_dedup_redis.py::test_large_set PASSED             [ 62%]\ntests/integration/test_dedup_redis.py::test_persistence_across_clients PASSED [ 66%]\ntests/integration/test_dedup_redis.py::test_isolation_between_stores PASSED [ 70%]\ntests/integration/test_graphiti.py::test_add_episode_creates_nodes SKIPPED [ 74%]\ntests/integration/test_graphiti.py::test_entity_merging_three_episodes SKIPPED [ 77%]\ntests/integration/test_graphiti.py::test_mentions_edges_created SKIPPED  [ 81%]\ntests/integration/test_graphiti.py::test_idempotency SKIPPED (OPENAI...) [ 85%]\ntests/integration/test_graphiti.py::test_source_description_persisted SKIPPED [ 88%]\ntests/integration/test_graphiti.py::test_group_id_scoping SKIPPED (O...) [ 92%]\ntests/integration/test_graphiti.py::test_build_indices_idempotent SKIPPED [ 96%]\ntests/integration/test_graphiti.py::test_search_returns_results SKIPPED  [100%]\n\n=============================== warnings summary ===============================\ntests/integration/test_celery_tasks.py::test_ingest_writes_episode\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/graphiti_core/driver/search_interface/search_interface.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=================== 19 passed, 8 skipped, 1 warning in 2.47s ===================\n"
+          },
+          "e2e": {
+            "total": 6,
+            "passed": 6,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 6 items\n\ntests/e2e/test_message_to_graph.py::test_youtube_url_message PASSED      [ 16%]\ntests/e2e/test_message_to_graph.py::test_github_url_message PASSED       [ 33%]\ntests/e2e/test_message_to_graph.py::test_image_url_message PASSED        [ 50%]\ntests/e2e/test_message_to_graph.py::test_pdf_url_message PASSED          [ 66%]\ntests/e2e/test_message_to_graph.py::test_multi_url_message PASSED        [ 83%]\ntests/e2e/test_message_to_graph.py::test_plain_text_message PASSED       [100%]\n\n============================== 6 passed in 0.20s ===============================\n"
+          },
+          "security": {
+            "total": 9,
+            "passed": 9,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 9 items\n\ntests/security/test_credential_isolation.py::test_no_keys_in_startup_logs PASSED [ 11%]\ntests/security/test_credential_isolation.py::test_no_keys_in_task_logs PASSED [ 22%]\ntests/security/test_credential_isolation.py::test_masking_format PASSED  [ 33%]\ntests/security/test_credential_isolation.py::test_bot_token_absent_from_logs PASSED [ 44%]\ntests/security/test_injection.py::test_sql_injection_in_content PASSED   [ 55%]\ntests/security/test_injection.py::test_xss_in_content PASSED             [ 66%]\ntests/security/test_injection.py::test_ssti_in_content PASSED            [ 77%]\ntests/security/test_injection.py::test_oversized_payload PASSED          [ 88%]\ntests/security/test_injection.py::test_unicode_edge_cases PASSED         [100%]\n\n============================== 9 passed in 0.32s ===============================\n"
+          }
+        }
+      },
+      "constraints": [
+        "FIX DEPLOY: Dockerfile must COPY source code before pip install (pip install . fails without package source)",
+        "FIX DEPLOY: supervisord.conf must not use %(ENV_*)s interpolation for missing env vars \u2014 hardcode defaults",
+        "FIX DEPLOY: Neo4j driver auth=(user, \"\") sends malformed token \u2014 use auth=None when NEO4J_PASSWORD is empty",
+        "FIX INTEGRATION: integration tests in tests/integration/ MUST connect to real Redis and real Neo4j \u2014 do NOT mock Redis or Neo4j clients in integration tests",
+        "FIX E2E: E2E tests in tests/e2e/ MUST exercise the actual pipeline end-to-end with real infra \u2014 use task.apply() for synchronous Celery execution, real Redis connections, real Neo4j queries",
+        "FIX E2E: each E2E test must verify data actually exists in Neo4j after pipeline runs \u2014 not just check return values from mocked functions"
+      ],
+      "started_at": "2026-04-18T10:30:01.111525+00:00",
+      "finished_at": "2026-04-18T11:03:10.597375+00:00"
+    },
+    {
+      "iteration": 2,
+      "agent_results": [
+        {
+          "name": "types-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 53.26999354362488
+        },
+        {
+          "name": "config-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 44.610799074172974
+        },
+        {
+          "name": "infra-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 49.40492343902588
+        },
+        {
+          "name": "redis-utils-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 43.790640115737915
+        },
+        {
+          "name": "resolvers-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 114.32962012290955
+        },
+        {
+          "name": "graphiti-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 31.489875078201294
+        },
+        {
+          "name": "frontier-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 42.43797278404236
+        },
+        {
+          "name": "ingestion-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 57.136192083358765
+        },
+        {
+          "name": "alerts-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 48.58746147155762
+        },
+        {
+          "name": "health-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 96.24083209037781
+        },
+        {
+          "name": "worker-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 55.37718677520752
+        },
+        {
+          "name": "integration-test-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 508.4797954559326
+        },
+        {
+          "name": "docs-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 193.25188374519348
+        }
+      ],
+      "eval_passed": true,
+      "eval_report": {
+        "passed": true,
+        "tests": {
+          "total": 390,
+          "passed": 390,
+          "failed": 0,
+          "errors": 0,
+          "output": "for more info.\n\ntests/unit/tasks/test_enrich_message.py::TestEnrichMessageReactionEvents::test_reactions_published_to_redis\n  /usr/lib/python3.12/unittest/mock.py:2129: RuntimeWarning: coroutine '_resolve_urls' was never awaited\n    if getattr(self, \"_mock_methods\", None) is not None:\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeBudgetCheck::test_budget_exceeded_triggers_retry\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine 'ContentDispatcher.dispatch' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCostTracking::test_cost_incremented_per_episode\ntests/unit/test_circuit_breaker.py::test_record_success_deletes_both_keys\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCostTracking::test_cost_incremented_per_episode\ntests/unit/test_circuit_breaker.py::test_record_success_deletes_both_keys\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_add_episode' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n390 passed, 10 warnings in 1.38s\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_add_episode' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n"
+        },
+        "imports": {
+          "ok": [
+            "seed_storage.enrichment.models",
+            "seed_storage.config",
+            "seed_storage.dedup",
+            "seed_storage.circuit_breaker",
+            "seed_storage.cost_tracking",
+            "seed_storage.rate_limiting",
+            "seed_storage.notifications",
+            "seed_storage.graphiti_client",
+            "seed_storage.health",
+            "seed_storage.enrichment.dispatcher",
+            "seed_storage.expansion.frontier",
+            "seed_storage.ingestion.bot",
+            "seed_storage.ingestion.batch",
+            "seed_storage.worker.app",
+            "seed_storage.worker.tasks",
+            "seed_storage.worker.dead_letters"
+          ],
+          "failed": []
+        },
+        "conventions": {
+          "violations": []
+        },
+        "production": {
+          "passed": false,
+          "deploy": {
+            "success": false,
+            "error": "Failed to trigger: None"
+          },
+          "integration": {
+            "total": 19,
+            "passed": 19,
+            "failed": 0,
+            "output": "ollected 27 items\n\ntests/integration/test_celery_tasks.py::test_enrich_end_to_end PASSED    [  3%]\ntests/integration/test_celery_tasks.py::test_ingest_writes_episode PASSED [  7%]\ntests/integration/test_celery_tasks.py::test_retry_on_transient_error PASSED [ 11%]\ntests/integration/test_celery_tasks.py::test_dead_letter_after_max_retries PASSED [ 14%]\ntests/integration/test_celery_tasks.py::test_reject_on_worker_lost_config PASSED [ 18%]\ntests/integration/test_celery_tasks.py::test_expand_task PASSED          [ 22%]\ntests/integration/test_celery_tasks.py::test_beat_fires_configuration PASSED [ 25%]\ntests/integration/test_celery_tasks.py::test_queue_routing PASSED        [ 29%]\ntests/integration/test_circuit_breaker_redis.py::test_cross_worker_state_shared PASSED [ 33%]\ntests/integration/test_circuit_breaker_redis.py::test_concurrent_failures_accumulate PASSED [ 37%]\ntests/integration/test_circuit_breaker_redis.py::test_cooldown_timing PASSED [ 40%]\ntests/integration/test_circuit_breaker_redis.py::test_reconnect_recovery PASSED [ 44%]\ntests/integration/test_circuit_breaker_redis.py::test_keys_listing PASSED [ 48%]\ntests/integration/test_dedup_redis.py::test_sadd_sismember_basic PASSED  [ 51%]\ntests/integration/test_dedup_redis.py::test_concurrent_access PASSED     [ 55%]\ntests/integration/test_dedup_redis.py::test_seen_or_mark_atomicity PASSED [ 59%]\ntests/integration/test_dedup_redis.py::test_large_set PASSED             [ 62%]\ntests/integration/test_dedup_redis.py::test_persistence_across_clients PASSED [ 66%]\ntests/integration/test_dedup_redis.py::test_isolation_between_stores PASSED [ 70%]\ntests/integration/test_graphiti.py::test_add_episode_creates_nodes SKIPPED [ 74%]\ntests/integration/test_graphiti.py::test_entity_merging_three_episodes SKIPPED [ 77%]\ntests/integration/test_graphiti.py::test_mentions_edges_created SKIPPED  [ 81%]\ntests/integration/test_graphiti.py::test_idempotency SKIPPED (OPENAI...) [ 85%]\ntests/integration/test_graphiti.py::test_source_description_persisted SKIPPED [ 88%]\ntests/integration/test_graphiti.py::test_group_id_scoping SKIPPED (O...) [ 92%]\ntests/integration/test_graphiti.py::test_build_indices_idempotent SKIPPED [ 96%]\ntests/integration/test_graphiti.py::test_search_returns_results SKIPPED  [100%]\n\n=============================== warnings summary ===============================\ntests/integration/test_celery_tasks.py::test_ingest_writes_episode\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/graphiti_core/driver/search_interface/search_interface.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=================== 19 passed, 8 skipped, 1 warning in 2.32s ===================\n"
+          },
+          "e2e": {
+            "total": 0,
+            "passed": 0,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 6 items\n\ntests/e2e/test_message_to_graph.py::test_plain_text_to_graph SKIPPED     [ 16%]\ntests/e2e/test_message_to_graph.py::test_youtube_url_to_graph SKIPPED    [ 33%]\ntests/e2e/test_message_to_graph.py::test_github_url_to_graph SKIPPED     [ 50%]\ntests/e2e/test_message_to_graph.py::test_image_url_to_graph SKIPPED      [ 66%]\ntests/e2e/test_message_to_graph.py::test_pdf_url_to_graph SKIPPED (O...) [ 83%]\ntests/e2e/test_message_to_graph.py::test_multi_url_to_graph SKIPPED      [100%]\n\n============================== 6 skipped in 0.02s ==============================\n"
+          },
+          "security": {
+            "total": 9,
+            "passed": 9,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 9 items\n\ntests/security/test_credential_isolation.py::test_no_keys_in_startup_logs PASSED [ 11%]\ntests/security/test_credential_isolation.py::test_no_keys_in_task_logs PASSED [ 22%]\ntests/security/test_credential_isolation.py::test_masking_format PASSED  [ 33%]\ntests/security/test_credential_isolation.py::test_bot_token_absent_from_logs PASSED [ 44%]\ntests/security/test_injection.py::test_sql_injection_in_content PASSED   [ 55%]\ntests/security/test_injection.py::test_xss_in_content PASSED             [ 66%]\ntests/security/test_injection.py::test_ssti_in_content PASSED            [ 77%]\ntests/security/test_injection.py::test_oversized_payload PASSED          [ 88%]\ntests/security/test_injection.py::test_unicode_edge_cases PASSED         [100%]\n\n============================== 9 passed in 0.33s ===============================\n"
+          }
+        }
+      },
+      "constraints": [
+        "FIX DEPLOY: Failed to trigger: None"
+      ],
+      "started_at": "2026-04-18T18:20:29.872185+00:00",
+      "finished_at": "2026-04-18T18:42:56.031078+00:00"
+    },
+    {
+      "iteration": 3,
+      "agent_results": [
+        {
+          "name": "types-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 31.71674418449402
+        },
+        {
+          "name": "config-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 60.46304988861084
+        },
+        {
+          "name": "infra-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 150.61654782295227
+        },
+        {
+          "name": "redis-utils-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 112.76285696029663
+        },
+        {
+          "name": "resolvers-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 48.90467810630798
+        },
+        {
+          "name": "graphiti-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 50.19366979598999
+        },
+        {
+          "name": "frontier-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 34.862350940704346
+        },
+        {
+          "name": "ingestion-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 52.95786809921265
+        },
+        {
+          "name": "alerts-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 79.91349625587463
+        },
+        {
+          "name": "health-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 42.63220763206482
+        },
+        {
+          "name": "worker-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 60.052133560180664
+        },
+        {
+          "name": "integration-test-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 146.2922899723053
+        },
+        {
+          "name": "docs-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 157.0644166469574
+        }
+      ],
+      "eval_passed": true,
+      "eval_report": {
+        "passed": true,
+        "tests": {
+          "total": 390,
+          "passed": 390,
+          "failed": 0,
+          "errors": 0,
+          "output": "for more info.\n\ntests/unit/tasks/test_enrich_message.py::TestEnrichMessageReactionEvents::test_reactions_published_to_redis\n  /usr/lib/python3.12/unittest/mock.py:2129: RuntimeWarning: coroutine '_resolve_urls' was never awaited\n    if getattr(self, \"_mock_methods\", None) is not None:\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeBudgetCheck::test_budget_exceeded_triggers_retry\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine 'ContentDispatcher.dispatch' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCostTracking::test_cost_incremented_per_episode\ntests/unit/test_circuit_breaker.py::test_record_success_deletes_both_keys\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCostTracking::test_cost_incremented_per_episode\ntests/unit/test_circuit_breaker.py::test_record_success_deletes_both_keys\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_add_episode' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n390 passed, 10 warnings in 1.92s\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_add_episode' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n"
+        },
+        "imports": {
+          "ok": [
+            "seed_storage.enrichment.models",
+            "seed_storage.config",
+            "seed_storage.dedup",
+            "seed_storage.circuit_breaker",
+            "seed_storage.cost_tracking",
+            "seed_storage.rate_limiting",
+            "seed_storage.notifications",
+            "seed_storage.graphiti_client",
+            "seed_storage.health",
+            "seed_storage.enrichment.dispatcher",
+            "seed_storage.expansion.frontier",
+            "seed_storage.ingestion.bot",
+            "seed_storage.ingestion.batch",
+            "seed_storage.worker.app",
+            "seed_storage.worker.tasks",
+            "seed_storage.worker.dead_letters"
+          ],
+          "failed": []
+        },
+        "conventions": {
+          "violations": []
+        },
+        "production": {
+          "passed": false,
+          "deploy": {
+            "success": false,
+            "error": "Deployed but health endpoint never responded"
+          },
+          "integration": {
+            "total": 1,
+            "passed": 0,
+            "failed": 1,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 27 items\n\ntests/integration/test_celery_tasks.py::test_enrich_end_to_end FAILED    [  3%]\n\n=================================== FAILURES ===================================\n____________________________ test_enrich_end_to_end ____________________________\ntests/integration/test_celery_tasks.py:125: in test_enrich_end_to_end\n    mock_ingest.delay.assert_called_once()\n/usr/lib/python3.12/unittest/mock.py:923: in assert_called_once\n    raise AssertionError(msg)\nE   AssertionError: Expected 'delay' to have been called once. Called 0 times.\n------------------------------ Captured log call -------------------------------\nERROR    seed_storage.worker.tasks:tasks.py:262 enrich_message: failed source_id=msg-7c47ebe7: a coroutine was expected, got <function _async_return.<locals>._inner at 0x77f71ea0e660>\nTraceback (most recent call last):\n  File \"/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/seed_storage/worker/tasks.py\", line 240, in enrich_message\n    resolved_contents = asyncio.run(_resolve_urls(dispatcher, new_urls))\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/asyncio/runners.py\", line 194, in run\n    return runner.run(main)\n           ^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/asyncio/runners.py\", line 89, in run\n    raise ValueError(\"a coroutine was expected, got {!r}\".format(coro))\nValueError: a coroutine was expected, got <function _async_return.<locals>._inner at 0x77f71ea0e660>\n=========================== short test summary info ============================\nFAILED tests/integration/test_celery_tasks.py::test_enrich_end_to_end - Asser...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.26s ===============================\n"
+          },
+          "e2e": {
+            "total": 0,
+            "passed": 0,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 6 items\n\ntests/e2e/test_message_to_graph.py::test_plain_text_to_graph SKIPPED     [ 16%]\ntests/e2e/test_message_to_graph.py::test_youtube_url_to_graph SKIPPED    [ 33%]\ntests/e2e/test_message_to_graph.py::test_github_url_to_graph SKIPPED     [ 50%]\ntests/e2e/test_message_to_graph.py::test_image_url_to_graph SKIPPED      [ 66%]\ntests/e2e/test_message_to_graph.py::test_pdf_url_to_graph SKIPPED (O...) [ 83%]\ntests/e2e/test_message_to_graph.py::test_multi_url_to_graph SKIPPED      [100%]\n\n============================== 6 skipped in 0.02s ==============================\n"
+          },
+          "security": {
+            "total": 9,
+            "passed": 9,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 9 items\n\ntests/security/test_credential_isolation.py::test_no_keys_in_startup_logs PASSED [ 11%]\ntests/security/test_credential_isolation.py::test_no_keys_in_task_logs PASSED [ 22%]\ntests/security/test_credential_isolation.py::test_masking_format PASSED  [ 33%]\ntests/security/test_credential_isolation.py::test_bot_token_absent_from_logs PASSED [ 44%]\ntests/security/test_injection.py::test_sql_injection_in_content PASSED   [ 55%]\ntests/security/test_injection.py::test_xss_in_content PASSED             [ 66%]\ntests/security/test_injection.py::test_ssti_in_content PASSED            [ 77%]\ntests/security/test_injection.py::test_oversized_payload PASSED          [ 88%]\ntests/security/test_injection.py::test_unicode_edge_cases PASSED         [100%]\n\n============================== 9 passed in 0.33s ===============================\n"
+          }
+        }
+      },
+      "constraints": [
+        "FIX DEPLOY: Deployed but health endpoint never responded",
+        "FIX INTEGRATION: tests/integration/test_celery_tasks.py::test_enrich_end_to_end FAILED    [  3%]",
+        "FIX INTEGRATION: ERROR    seed_storage.worker.tasks:tasks.py:262 enrich_message: failed source_id=msg-7c47ebe7: a coroutine was expected, got <function _async_return.<locals>._inner at 0x77f71ea0e660>",
+        "FIX INTEGRATION: FAILED tests/integration/test_celery_tasks.py::test_enrich_end_to_end - Asser..."
+      ],
+      "started_at": "2026-04-18T18:44:54.442437+00:00",
+      "finished_at": "2026-04-18T19:02:12.387100+00:00"
+    },
+    {
+      "iteration": 4,
+      "agent_results": [
+        {
+          "name": "types-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 32.96532678604126
+        },
+        {
+          "name": "config-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 128.08091235160828
+        },
+        {
+          "name": "infra-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 303.4642288684845
+        },
+        {
+          "name": "redis-utils-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 157.0836250782013
+        },
+        {
+          "name": "resolvers-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 325.3639385700226
+        },
+        {
+          "name": "graphiti-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 66.95539164543152
+        },
+        {
+          "name": "frontier-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 34.70428204536438
+        },
+        {
+          "name": "ingestion-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 218.57017254829407
+        },
+        {
+          "name": "alerts-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 73.17561602592468
+        },
+        {
+          "name": "health-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 315.34359312057495
+        },
+        {
+          "name": "worker-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 257.37085700035095
+        },
+        {
+          "name": "integration-test-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 632.4494595527649
+        },
+        {
+          "name": "docs-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 234.0159318447113
+        }
+      ],
+      "eval_passed": true,
+      "eval_report": {
+        "passed": true,
+        "tests": {
+          "total": 390,
+          "passed": 390,
+          "failed": 0,
+          "errors": 0,
+          "output": "for more info.\n\ntests/unit/tasks/test_enrich_message.py::TestEnrichMessageReactionEvents::test_reactions_published_to_redis\n  /usr/lib/python3.12/unittest/mock.py:2129: RuntimeWarning: coroutine '_resolve_urls' was never awaited\n    if getattr(self, \"_mock_methods\", None) is not None:\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeBudgetCheck::test_budget_exceeded_triggers_retry\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine 'ContentDispatcher.dispatch' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCostTracking::test_cost_incremented_per_episode\ntests/unit/test_circuit_breaker.py::test_record_success_deletes_both_keys\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCostTracking::test_cost_incremented_per_episode\ntests/unit/test_circuit_breaker.py::test_record_success_deletes_both_keys\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_add_episode' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n390 passed, 10 warnings in 1.38s\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_add_episode' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n"
+        },
+        "imports": {
+          "ok": [
+            "seed_storage.enrichment.models",
+            "seed_storage.config",
+            "seed_storage.dedup",
+            "seed_storage.circuit_breaker",
+            "seed_storage.cost_tracking",
+            "seed_storage.rate_limiting",
+            "seed_storage.notifications",
+            "seed_storage.graphiti_client",
+            "seed_storage.health",
+            "seed_storage.enrichment.dispatcher",
+            "seed_storage.expansion.frontier",
+            "seed_storage.ingestion.bot",
+            "seed_storage.ingestion.batch",
+            "seed_storage.worker.app",
+            "seed_storage.worker.tasks",
+            "seed_storage.worker.dead_letters"
+          ],
+          "failed": []
+        },
+        "conventions": {
+          "violations": []
+        },
+        "production": {
+          "passed": false,
+          "deploy": {
+            "success": true,
+            "error": null
+          },
+          "integration": {
+            "total": 19,
+            "passed": 19,
+            "failed": 0,
+            "output": "ollected 27 items\n\ntests/integration/test_celery_tasks.py::test_enrich_end_to_end PASSED    [  3%]\ntests/integration/test_celery_tasks.py::test_ingest_writes_episode PASSED [  7%]\ntests/integration/test_celery_tasks.py::test_retry_on_transient_error PASSED [ 11%]\ntests/integration/test_celery_tasks.py::test_dead_letter_after_max_retries PASSED [ 14%]\ntests/integration/test_celery_tasks.py::test_reject_on_worker_lost_config PASSED [ 18%]\ntests/integration/test_celery_tasks.py::test_expand_task PASSED          [ 22%]\ntests/integration/test_celery_tasks.py::test_beat_fires_configuration PASSED [ 25%]\ntests/integration/test_celery_tasks.py::test_queue_routing PASSED        [ 29%]\ntests/integration/test_circuit_breaker_redis.py::test_cross_worker_state_shared PASSED [ 33%]\ntests/integration/test_circuit_breaker_redis.py::test_concurrent_failures_accumulate PASSED [ 37%]\ntests/integration/test_circuit_breaker_redis.py::test_cooldown_timing PASSED [ 40%]\ntests/integration/test_circuit_breaker_redis.py::test_reconnect_recovery PASSED [ 44%]\ntests/integration/test_circuit_breaker_redis.py::test_keys_listing PASSED [ 48%]\ntests/integration/test_dedup_redis.py::test_sadd_sismember_basic PASSED  [ 51%]\ntests/integration/test_dedup_redis.py::test_concurrent_access PASSED     [ 55%]\ntests/integration/test_dedup_redis.py::test_seen_or_mark_atomicity PASSED [ 59%]\ntests/integration/test_dedup_redis.py::test_large_set PASSED             [ 62%]\ntests/integration/test_dedup_redis.py::test_persistence_across_clients PASSED [ 66%]\ntests/integration/test_dedup_redis.py::test_isolation_between_stores PASSED [ 70%]\ntests/integration/test_graphiti.py::test_add_episode_creates_nodes SKIPPED [ 74%]\ntests/integration/test_graphiti.py::test_entity_merging_three_episodes SKIPPED [ 77%]\ntests/integration/test_graphiti.py::test_mentions_edges_created SKIPPED  [ 81%]\ntests/integration/test_graphiti.py::test_idempotency SKIPPED (OPENAI...) [ 85%]\ntests/integration/test_graphiti.py::test_source_description_persisted SKIPPED [ 88%]\ntests/integration/test_graphiti.py::test_group_id_scoping SKIPPED (O...) [ 92%]\ntests/integration/test_graphiti.py::test_build_indices_idempotent SKIPPED [ 96%]\ntests/integration/test_graphiti.py::test_search_returns_results SKIPPED  [100%]\n\n=============================== warnings summary ===============================\ntests/integration/test_celery_tasks.py::test_ingest_writes_episode\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/graphiti_core/driver/search_interface/search_interface.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=================== 19 passed, 8 skipped, 1 warning in 2.72s ===================\n"
+          },
+          "e2e": {
+            "total": 0,
+            "passed": 0,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 6 items\n\ntests/e2e/test_message_to_graph.py::test_plain_text_to_graph SKIPPED     [ 16%]\ntests/e2e/test_message_to_graph.py::test_youtube_url_to_graph SKIPPED    [ 33%]\ntests/e2e/test_message_to_graph.py::test_github_url_to_graph SKIPPED     [ 50%]\ntests/e2e/test_message_to_graph.py::test_image_url_to_graph SKIPPED      [ 66%]\ntests/e2e/test_message_to_graph.py::test_pdf_url_to_graph SKIPPED (O...) [ 83%]\ntests/e2e/test_message_to_graph.py::test_multi_url_to_graph SKIPPED      [100%]\n\n============================== 6 skipped in 0.02s ==============================\n"
+          },
+          "security": {
+            "total": 9,
+            "passed": 9,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 9 items\n\ntests/security/test_credential_isolation.py::test_no_keys_in_startup_logs PASSED [ 11%]\ntests/security/test_credential_isolation.py::test_no_keys_in_task_logs PASSED [ 22%]\ntests/security/test_credential_isolation.py::test_masking_format PASSED  [ 33%]\ntests/security/test_credential_isolation.py::test_bot_token_absent_from_logs PASSED [ 44%]\ntests/security/test_injection.py::test_sql_injection_in_content PASSED   [ 55%]\ntests/security/test_injection.py::test_xss_in_content PASSED             [ 66%]\ntests/security/test_injection.py::test_ssti_in_content PASSED            [ 77%]\ntests/security/test_injection.py::test_oversized_payload PASSED          [ 88%]\ntests/security/test_injection.py::test_unicode_edge_cases PASSED         [100%]\n\n============================== 9 passed in 0.33s ===============================\n"
+          }
+        }
+      },
+      "constraints": [],
+      "started_at": "2026-04-18T19:11:52.864459+00:00",
+      "finished_at": "2026-04-18T19:58:20.148646+00:00"
+    },
+    {
+      "iteration": 5,
+      "agent_results": [
+        {
+          "name": "types-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 28.102800369262695
+        },
+        {
+          "name": "config-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 49.933526277542114
+        },
+        {
+          "name": "infra-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 50.49102759361267
+        },
+        {
+          "name": "redis-utils-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 45.818355560302734
+        },
+        {
+          "name": "resolvers-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 25.437994241714478
+        },
+        {
+          "name": "graphiti-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 32.16318321228027
+        },
+        {
+          "name": "frontier-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 41.44205713272095
+        },
+        {
+          "name": "ingestion-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 30.72107744216919
+        },
+        {
+          "name": "alerts-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 60.53563690185547
+        },
+        {
+          "name": "health-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 37.51155376434326
+        },
+        {
+          "name": "worker-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 60.029136657714844
+        },
+        {
+          "name": "integration-test-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 293.5066330432892
+        },
+        {
+          "name": "docs-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 83.92900276184082
+        }
+      ],
+      "eval_passed": true,
+      "eval_report": {
+        "passed": true,
+        "tests": {
+          "total": 390,
+          "passed": 390,
+          "failed": 0,
+          "errors": 0,
+          "output": "for more info.\n\ntests/unit/tasks/test_enrich_message.py::TestEnrichMessageReactionEvents::test_reactions_published_to_redis\n  /usr/lib/python3.12/unittest/mock.py:2129: RuntimeWarning: coroutine '_resolve_urls' was never awaited\n    if getattr(self, \"_mock_methods\", None) is not None:\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeBudgetCheck::test_budget_exceeded_triggers_retry\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine 'ContentDispatcher.dispatch' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCostTracking::test_cost_incremented_per_episode\ntests/unit/test_circuit_breaker.py::test_record_success_deletes_both_keys\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCostTracking::test_cost_incremented_per_episode\ntests/unit/test_circuit_breaker.py::test_record_success_deletes_both_keys\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_add_episode' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n390 passed, 10 warnings in 1.40s\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_get_graphiti_instance' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_add_episode' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n"
+        },
+        "imports": {
+          "ok": [
+            "seed_storage.enrichment.models",
+            "seed_storage.config",
+            "seed_storage.dedup",
+            "seed_storage.circuit_breaker",
+            "seed_storage.cost_tracking",
+            "seed_storage.rate_limiting",
+            "seed_storage.notifications",
+            "seed_storage.graphiti_client",
+            "seed_storage.health",
+            "seed_storage.enrichment.dispatcher",
+            "seed_storage.expansion.frontier",
+            "seed_storage.ingestion.bot",
+            "seed_storage.ingestion.batch",
+            "seed_storage.worker.app",
+            "seed_storage.worker.tasks",
+            "seed_storage.worker.dead_letters"
+          ],
+          "failed": []
+        },
+        "conventions": {
+          "violations": []
+        },
+        "production": {
+          "passed": false,
+          "deploy": {
+            "success": false,
+            "error": "Deploy failed: Credential 'openai' missing proxy_target \u2014 all env-mode credentials require proxy_target for iron-proxy. Set it via: ./infra/scripts/proxy-enable.sh openai <upstream_url>"
+          },
+          "integration": {
+            "total": 20,
+            "passed": 19,
+            "failed": 1,
+            "output": "/_async_compat/network/_bolt_socket.py:191: in recv_into\n    res = await self._wait_for_read(self._reader.read, nbytes)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.12/site-packages/neo4j/_async_compat/network/_bolt_socket.py:143: in _wait_for_io\n    return await wait_for(io_fut, timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/usr/lib/python3.12/asyncio/tasks.py:520: in wait_for\n    return await fut\n           ^^^^^^^^^\n/usr/lib/python3.12/asyncio/streams.py:713: in read\n    await self._wait_for_data('read')\n/usr/lib/python3.12/asyncio/streams.py:545: in _wait_for_data\n    await self._waiter\nE   RuntimeError: Task <Task pending name='Task-155' coro=<_add_episode() running at /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/tests/integration/test_graphiti.py:92> cb=[_run_until_complete_cb() at /usr/lib/python3.12/asyncio/base_events.py:182]> got Future <Future pending> attached to a different loop\n------------------------------ Captured log call -------------------------------\nERROR    graphiti_core.driver.neo4j_driver:neo4j_driver.py:174 Error executing Neo4j query: Task <Task pending name='Task-155' coro=<_add_episode() running at /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/tests/integration/test_graphiti.py:92> cb=[_run_until_complete_cb() at /usr/lib/python3.12/asyncio/base_events.py:182]> got Future <Future pending> attached to a different loop\n\n                                    MATCH (e:Episodic)\n                                    WHERE e.valid_at <= $reference_time\n                                    \nAND e.group_id IN $group_ids\nAND e.source = $source\n        RETURN\n        \n    e.uuid AS uuid,\n    e.name AS name,\n    e.group_id AS group_id,\n    e.created_at AS created_at,\n    e.source AS source,\n    e.source_description AS source_description,\n    e.content AS content,\n    e.valid_at AS valid_at,\n    e.entity_edges AS entity_edges\n\n        ORDER BY e.valid_at DESC\n        LIMIT $num_episodes\n        \n{'database_': 'neo4j'}\n=============================== warnings summary ===============================\ntests/integration/test_celery_tasks.py::test_ingest_writes_episode\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/graphiti_core/driver/search_interface/search_interface.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/integration/test_graphiti.py::test_add_episode_creates_nodes - R...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=================== 1 failed, 19 passed, 1 warning in 3.15s ====================\n"
+          },
+          "e2e": {
+            "total": 1,
+            "passed": 0,
+            "failed": 1,
+            "output": "d-storage-forge/.venv/lib/python3.12/site-packages/neo4j/_async_compat/network/_bolt_socket.py\", line 191, in recv_into\n    res = await self._wait_for_read(self._reader.read, nbytes)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/neo4j/_async_compat/network/_bolt_socket.py\", line 143, in _wait_for_io\n    return await wait_for(io_fut, timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/asyncio/tasks.py\", line 520, in wait_for\n    return await fut\n           ^^^^^^^^^\n  File \"/usr/lib/python3.12/asyncio/streams.py\", line 713, in read\n    await self._wait_for_data('read')\n  File \"/usr/lib/python3.12/asyncio/streams.py\", line 545, in _wait_for_data\n    await self._waiter\nRuntimeError: Task <Task pending name='Task-131' coro=<_add_episode() running at /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/seed_storage/worker/tasks.py:544> cb=[_run_until_complete_cb() at /usr/lib/python3.12/asyncio/base_events.py:182]> got Future <Future pending> attached to a different loop\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/seed_storage/worker/tasks.py\", line 416, in ingest_episode\n    raise self.retry(exc=exc)\n          ^^^^^^^^^^^^^^^^^^^\n  File \"/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/celery/app/task.py\", line 782, in retry\n    raise ret\ncelery.exceptions.Retry: Retry in 30s: RuntimeError(\"Task <Task pending name='Task-131' coro=<_add_episode() running at /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/seed_storage/worker/tasks.py:544> cb=[_run_until_complete_cb() at /usr/lib/python3.12/asyncio/base_events.py:182]> got Future <Future pending> attached to a different loop\")\nWARNING  seed_storage.worker.tasks:tasks.py:374 ingest_episode: circuit breaker open for graphiti, skipping\n=============================== warnings summary ===============================\ntests/e2e/test_message_to_graph.py::test_plain_text_to_graph\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/graphiti_core/driver/search_interface/search_interface.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/e2e/test_message_to_graph.py::test_plain_text_to_graph - Asserti...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n========================= 1 failed, 1 warning in 1.42s =========================\n"
+          },
+          "security": {
+            "total": 9,
+            "passed": 9,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 9 items\n\ntests/security/test_credential_isolation.py::test_no_keys_in_startup_logs PASSED [ 11%]\ntests/security/test_credential_isolation.py::test_no_keys_in_task_logs PASSED [ 22%]\ntests/security/test_credential_isolation.py::test_masking_format PASSED  [ 33%]\ntests/security/test_credential_isolation.py::test_bot_token_absent_from_logs PASSED [ 44%]\ntests/security/test_injection.py::test_sql_injection_in_content PASSED   [ 55%]\ntests/security/test_injection.py::test_xss_in_content PASSED             [ 66%]\ntests/security/test_injection.py::test_ssti_in_content PASSED            [ 77%]\ntests/security/test_injection.py::test_oversized_payload PASSED          [ 88%]\ntests/security/test_injection.py::test_unicode_edge_cases PASSED         [100%]\n\n============================== 9 passed in 0.32s ===============================\n"
+          }
+        }
+      },
+      "constraints": [
+        "FIX DEPLOY: Deploy failed: Credential 'openai' missing proxy_target \u2014 all env-mode credentials require proxy_target for iron-proxy. Set it via: ./infra/scripts/proxy-enable.sh openai <upstream_url>",
+        "FIX INTEGRATION: ERROR    graphiti_core.driver.neo4j_driver:neo4j_driver.py:174 Error executing Neo4j query: Task <Task pending name='Task-155' coro=<_add_episode() running at /home/wyler-zahm/Desktop/cruse-control/se",
+        "FIX INTEGRATION: FAILED tests/integration/test_graphiti.py::test_add_episode_creates_nodes - R...",
+        "FIX E2E: FAILED tests/e2e/test_message_to_graph.py::test_plain_text_to_graph - Asserti..."
+      ],
+      "started_at": "2026-04-18T21:51:08.342713+00:00",
+      "finished_at": "2026-04-18T22:05:15.836464+00:00"
+    },
+    {
+      "iteration": 6,
+      "agent_results": [
+        {
+          "name": "types-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 27.557427406311035
+        },
+        {
+          "name": "config-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 90.2311098575592
+        },
+        {
+          "name": "infra-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 486.69546151161194
+        },
+        {
+          "name": "redis-utils-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 44.58547019958496
+        },
+        {
+          "name": "resolvers-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 56.04423666000366
+        },
+        {
+          "name": "graphiti-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 30.575834035873413
+        },
+        {
+          "name": "frontier-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 45.586270809173584
+        },
+        {
+          "name": "ingestion-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 64.28333449363708
+        },
+        {
+          "name": "alerts-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 50.64012694358826
+        },
+        {
+          "name": "health-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 26.964685916900635
+        },
+        {
+          "name": "worker-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 268.36755442619324
+        },
+        {
+          "name": "integration-test-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 459.1261806488037
+        },
+        {
+          "name": "docs-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 152.95059275627136
+        }
+      ],
+      "eval_passed": true,
+      "eval_report": {
+        "passed": true,
+        "tests": {
+          "total": 390,
+          "passed": 390,
+          "failed": 0,
+          "errors": 0,
+          "output": ", use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\ntests/unit/ingestion/test_bot.py::TestOnMessage::test_configured_channel_is_processed\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/discord/player.py:30: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13\n    import audioop\n\ntests/unit/tasks/test_enrich_message.py::TestEnrichMessageDedup::test_url_dedup_skips_seen_url\ntests/unit/tasks/test_expand_frontier.py::TestDepthCeiling::test_below_ceiling_allows_expansion\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_resolve_urls' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCircuitBreaker::test_open_circuit_breaker_skips_ingest\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine 'ContentDispatcher.dispatch' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeEmptyResolved::test_empty_resolved_contents_writes_message_episode\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_write_all_episodes' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n390 passed, 6 warnings in 1.40s\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_write_all_episodes' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n"
+        },
+        "imports": {
+          "ok": [
+            "seed_storage.enrichment.models",
+            "seed_storage.config",
+            "seed_storage.dedup",
+            "seed_storage.circuit_breaker",
+            "seed_storage.cost_tracking",
+            "seed_storage.rate_limiting",
+            "seed_storage.notifications",
+            "seed_storage.graphiti_client",
+            "seed_storage.health",
+            "seed_storage.enrichment.dispatcher",
+            "seed_storage.expansion.frontier",
+            "seed_storage.ingestion.bot",
+            "seed_storage.ingestion.batch",
+            "seed_storage.worker.app",
+            "seed_storage.worker.tasks",
+            "seed_storage.worker.dead_letters"
+          ],
+          "failed": []
+        },
+        "conventions": {
+          "violations": []
+        },
+        "production": {
+          "passed": false,
+          "deploy": {
+            "success": false,
+            "error": "Deploy failed: Credential 'openai' missing proxy_target \u2014 all env-mode credentials require proxy_target for iron-proxy. Set it via: ./infra/scripts/proxy-enable.sh openai <upstream_url>"
+          },
+          "integration": {
+            "total": 20,
+            "passed": 19,
+            "failed": 1,
+            "output": "ker_lost_config PASSED [ 18%]\ntests/integration/test_celery_tasks.py::test_expand_task PASSED          [ 22%]\ntests/integration/test_celery_tasks.py::test_beat_fires_configuration PASSED [ 25%]\ntests/integration/test_celery_tasks.py::test_queue_routing PASSED        [ 29%]\ntests/integration/test_circuit_breaker_redis.py::test_cross_worker_state_shared PASSED [ 33%]\ntests/integration/test_circuit_breaker_redis.py::test_concurrent_failures_accumulate PASSED [ 37%]\ntests/integration/test_circuit_breaker_redis.py::test_cooldown_timing PASSED [ 40%]\ntests/integration/test_circuit_breaker_redis.py::test_reconnect_recovery PASSED [ 44%]\ntests/integration/test_circuit_breaker_redis.py::test_keys_listing PASSED [ 48%]\ntests/integration/test_dedup_redis.py::test_sadd_sismember_basic PASSED  [ 51%]\ntests/integration/test_dedup_redis.py::test_concurrent_access PASSED     [ 55%]\ntests/integration/test_dedup_redis.py::test_seen_or_mark_atomicity PASSED [ 59%]\ntests/integration/test_dedup_redis.py::test_large_set PASSED             [ 62%]\ntests/integration/test_dedup_redis.py::test_persistence_across_clients PASSED [ 66%]\ntests/integration/test_dedup_redis.py::test_isolation_between_stores PASSED [ 70%]\ntests/integration/test_graphiti.py::test_add_episode_creates_nodes FAILED [ 74%]\n\n=================================== FAILURES ===================================\n________________________ test_add_episode_creates_nodes ________________________\ntests/integration/test_graphiti.py:176: in test_add_episode_creates_nodes\n    _run(_body(), shared_event_loop)\ntests/integration/test_graphiti.py:115: in _run\n    return loop.run_until_complete(coro)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete\n    return future.result()\n           ^^^^^^^^^^^^^^^\ntests/integration/test_graphiti.py:168: in _body\n    result, _, _ = await g.neo4j_driver.execute_query(\n                         ^^^^^^^^^^^^^^\nE   AttributeError: 'Graphiti' object has no attribute 'neo4j_driver'\n=============================== warnings summary ===============================\ntests/integration/test_celery_tasks.py::test_ingest_writes_episode\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/graphiti_core/driver/search_interface/search_interface.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/integration/test_graphiti.py::test_add_episode_creates_nodes - A...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=================== 1 failed, 19 passed, 1 warning in 40.10s ===================\n"
+          },
+          "e2e": {
+            "total": 6,
+            "passed": 6,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 6 items\n\ntests/e2e/test_message_to_graph.py::test_plain_text_to_graph PASSED      [ 16%]\ntests/e2e/test_message_to_graph.py::test_youtube_url_to_graph PASSED     [ 33%]\ntests/e2e/test_message_to_graph.py::test_github_url_to_graph PASSED      [ 50%]\ntests/e2e/test_message_to_graph.py::test_image_url_to_graph PASSED       [ 66%]\ntests/e2e/test_message_to_graph.py::test_pdf_url_to_graph PASSED         [ 83%]\ntests/e2e/test_message_to_graph.py::test_multi_url_to_graph PASSED       [100%]\n\n=============================== warnings summary ===============================\ntests/e2e/test_message_to_graph.py::test_plain_text_to_graph\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/graphiti_core/driver/search_interface/search_interface.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=================== 6 passed, 1 warning in 184.33s (0:03:04) ===================\n"
+          },
+          "security": {
+            "total": 9,
+            "passed": 9,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 9 items\n\ntests/security/test_credential_isolation.py::test_no_keys_in_startup_logs PASSED [ 11%]\ntests/security/test_credential_isolation.py::test_no_keys_in_task_logs PASSED [ 22%]\ntests/security/test_credential_isolation.py::test_masking_format PASSED  [ 33%]\ntests/security/test_credential_isolation.py::test_bot_token_absent_from_logs PASSED [ 44%]\ntests/security/test_injection.py::test_sql_injection_in_content PASSED   [ 55%]\ntests/security/test_injection.py::test_xss_in_content PASSED             [ 66%]\ntests/security/test_injection.py::test_ssti_in_content PASSED            [ 77%]\ntests/security/test_injection.py::test_oversized_payload PASSED          [ 88%]\ntests/security/test_injection.py::test_unicode_edge_cases PASSED         [100%]\n\n============================== 9 passed in 0.39s ===============================\n"
+          }
+        }
+      },
+      "constraints": [
+        "FIX DEPLOY: Deploy failed: Credential 'openai' missing proxy_target \u2014 all env-mode credentials require proxy_target for iron-proxy. Set it via: ./infra/scripts/proxy-enable.sh openai <upstream_url>",
+        "FIX INTEGRATION: tests/integration/test_graphiti.py::test_add_episode_creates_nodes FAILED [ 74%]",
+        "FIX INTEGRATION: FAILED tests/integration/test_graphiti.py::test_add_episode_creates_nodes - A..."
+      ],
+      "started_at": "2026-04-18T22:05:49.542256+00:00",
+      "finished_at": "2026-04-18T22:36:00.880994+00:00"
+    },
+    {
+      "iteration": 7,
+      "agent_results": [
+        {
+          "name": "types-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 33.49730443954468
+        },
+        {
+          "name": "config-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 51.23066782951355
+        },
+        {
+          "name": "infra-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 223.9325647354126
+        },
+        {
+          "name": "redis-utils-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 40.50989365577698
+        },
+        {
+          "name": "resolvers-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 28.370615482330322
+        },
+        {
+          "name": "graphiti-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 232.8275966644287
+        },
+        {
+          "name": "frontier-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 27.287168502807617
+        },
+        {
+          "name": "ingestion-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 44.08032011985779
+        },
+        {
+          "name": "alerts-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 78.2562325000763
+        },
+        {
+          "name": "health-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 29.00205373764038
+        },
+        {
+          "name": "worker-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 53.29067897796631
+        },
+        {
+          "name": "integration-test-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 638.3781735897064
+        },
+        {
+          "name": "docs-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 199.7114679813385
+        }
+      ],
+      "eval_passed": true,
+      "eval_report": {
+        "passed": true,
+        "tests": {
+          "total": 390,
+          "passed": 390,
+          "failed": 0,
+          "errors": 0,
+          "output": ", use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\ntests/unit/ingestion/test_bot.py::TestOnMessage::test_configured_channel_is_processed\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/discord/player.py:30: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13\n    import audioop\n\ntests/unit/tasks/test_enrich_message.py::TestEnrichMessageDedup::test_url_dedup_skips_seen_url\ntests/unit/tasks/test_expand_frontier.py::TestDepthCeiling::test_below_ceiling_allows_expansion\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_resolve_urls' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCircuitBreaker::test_open_circuit_breaker_skips_ingest\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine 'ContentDispatcher.dispatch' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeEmptyResolved::test_empty_resolved_contents_writes_message_episode\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_write_all_episodes' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n390 passed, 6 warnings in 1.38s\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_write_all_episodes' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n"
+        },
+        "imports": {
+          "ok": [
+            "seed_storage.enrichment.models",
+            "seed_storage.config",
+            "seed_storage.dedup",
+            "seed_storage.circuit_breaker",
+            "seed_storage.cost_tracking",
+            "seed_storage.rate_limiting",
+            "seed_storage.notifications",
+            "seed_storage.graphiti_client",
+            "seed_storage.health",
+            "seed_storage.enrichment.dispatcher",
+            "seed_storage.expansion.frontier",
+            "seed_storage.ingestion.bot",
+            "seed_storage.ingestion.batch",
+            "seed_storage.worker.app",
+            "seed_storage.worker.tasks",
+            "seed_storage.worker.dead_letters"
+          ],
+          "failed": []
+        },
+        "conventions": {
+          "violations": []
+        },
+        "production": {
+          "passed": false,
+          "deploy": {
+            "success": false,
+            "error": "Deploy failed: Credential 'openai' missing proxy_target \u2014 all env-mode credentials require proxy_target for iron-proxy. Set it via: ./infra/scripts/proxy-enable.sh openai <upstream_url>"
+          },
+          "integration": {
+            "total": 24,
+            "passed": 23,
+            "failed": 1,
+            "output": "sistence_across_clients PASSED [ 66%]\ntests/integration/test_dedup_redis.py::test_isolation_between_stores PASSED [ 70%]\ntests/integration/test_graphiti.py::test_add_episode_creates_nodes PASSED [ 74%]\ntests/integration/test_graphiti.py::test_entity_merging_three_episodes PASSED [ 77%]\ntests/integration/test_graphiti.py::test_mentions_edges_created PASSED   [ 81%]\ntests/integration/test_graphiti.py::test_idempotency PASSED              [ 85%]\ntests/integration/test_graphiti.py::test_source_description_persisted FAILED [ 88%]\n\n=================================== FAILURES ===================================\n______________________ test_source_description_persisted _______________________\ntests/integration/test_graphiti.py:289: in test_source_description_persisted\n    _run(_body(), shared_event_loop)\ntests/integration/test_graphiti.py:115: in _run\n    return loop.run_until_complete(coro)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete\n    return future.result()\n           ^^^^^^^^^^^^^^^\ntests/integration/test_graphiti.py:286: in _body\n    assert count >= 1\nE   assert 0 >= 1\n------------------------------ Captured log call -------------------------------\nWARNING  neo4j.notifications:result.py:343 Received notification from DBMS server: <GqlStatusObject gql_status='01N50', status_description='warn: label does not exist. The label `EpisodicNode` does not exist. Verify that the spelling is correct.', position=<SummaryInputPosition line=1, column=10, offset=9>, raw_classification='UNRECOGNIZED', classification=<NotificationClassification.UNRECOGNIZED: 'UNRECOGNIZED'>, raw_severity='WARNING', severity=<NotificationSeverity.WARNING: 'WARNING'>, diagnostic_record={'_classification': 'UNRECOGNIZED', '_severity': 'WARNING', '_position': {'offset': 9, 'line': 1, 'column': 10}, 'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/'}> for query: 'MATCH (e:EpisodicNode) WHERE e.group_id = $gid AND e.source_description = $sd RETURN count(e) AS cnt'\n=============================== warnings summary ===============================\ntests/integration/test_celery_tasks.py::test_ingest_writes_episode\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/graphiti_core/driver/search_interface/search_interface.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/integration/test_graphiti.py::test_source_description_persisted\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============== 1 failed, 23 passed, 1 warning in 77.16s (0:01:17) ==============\n"
+          },
+          "e2e": {
+            "total": 6,
+            "passed": 6,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 6 items\n\ntests/e2e/test_message_to_graph.py::test_plain_text_to_graph PASSED      [ 16%]\ntests/e2e/test_message_to_graph.py::test_youtube_url_to_graph PASSED     [ 33%]\ntests/e2e/test_message_to_graph.py::test_github_url_to_graph PASSED      [ 50%]\ntests/e2e/test_message_to_graph.py::test_image_url_to_graph PASSED       [ 66%]\ntests/e2e/test_message_to_graph.py::test_pdf_url_to_graph PASSED         [ 83%]\ntests/e2e/test_message_to_graph.py::test_multi_url_to_graph PASSED       [100%]\n\n=============================== warnings summary ===============================\ntests/e2e/test_message_to_graph.py::test_plain_text_to_graph\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/graphiti_core/driver/search_interface/search_interface.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=================== 6 passed, 1 warning in 72.08s (0:01:12) ====================\n"
+          },
+          "security": {
+            "total": 9,
+            "passed": 9,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 9 items\n\ntests/security/test_credential_isolation.py::test_no_keys_in_startup_logs PASSED [ 11%]\ntests/security/test_credential_isolation.py::test_no_keys_in_task_logs PASSED [ 22%]\ntests/security/test_credential_isolation.py::test_masking_format PASSED  [ 33%]\ntests/security/test_credential_isolation.py::test_bot_token_absent_from_logs PASSED [ 44%]\ntests/security/test_injection.py::test_sql_injection_in_content PASSED   [ 55%]\ntests/security/test_injection.py::test_xss_in_content PASSED             [ 66%]\ntests/security/test_injection.py::test_ssti_in_content PASSED            [ 77%]\ntests/security/test_injection.py::test_oversized_payload PASSED          [ 88%]\ntests/security/test_injection.py::test_unicode_edge_cases PASSED         [100%]\n\n============================== 9 passed in 0.40s ===============================\n"
+          }
+        }
+      },
+      "constraints": [
+        "FIX DEPLOY: Deploy failed: Credential 'openai' missing proxy_target \u2014 all env-mode credentials require proxy_target for iron-proxy. Set it via: ./infra/scripts/proxy-enable.sh openai <upstream_url>",
+        "FIX INTEGRATION: tests/integration/test_graphiti.py::test_source_description_persisted FAILED [ 88%]",
+        "FIX INTEGRATION: FAILED tests/integration/test_graphiti.py::test_source_description_persisted"
+      ],
+      "started_at": "2026-04-18T22:40:13.513350+00:00",
+      "finished_at": "2026-04-18T23:08:21.598573+00:00"
+    },
+    {
+      "iteration": 8,
+      "agent_results": [
+        {
+          "name": "types-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 28.018099546432495
+        },
+        {
+          "name": "config-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 236.92322373390198
+        },
+        {
+          "name": "infra-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 223.65602445602417
+        },
+        {
+          "name": "redis-utils-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 40.71299743652344
+        },
+        {
+          "name": "resolvers-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 177.4033398628235
+        },
+        {
+          "name": "graphiti-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 147.89092659950256
+        },
+        {
+          "name": "frontier-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 64.88923931121826
+        },
+        {
+          "name": "ingestion-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 45.30882668495178
+        },
+        {
+          "name": "alerts-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 43.31834888458252
+        },
+        {
+          "name": "health-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 38.0438129901886
+        },
+        {
+          "name": "worker-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 526.3366513252258
+        },
+        {
+          "name": "integration-test-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 129.5076813697815
+        },
+        {
+          "name": "docs-agent",
+          "status": "success",
+          "exit_code": 0,
+          "error": null,
+          "test_count": 0,
+          "duration_s": 382.1271800994873
+        }
+      ],
+      "eval_passed": true,
+      "eval_report": {
+        "passed": true,
+        "tests": {
+          "total": 390,
+          "passed": 390,
+          "failed": 0,
+          "errors": 0,
+          "output": ", use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\ntests/unit/ingestion/test_bot.py::TestOnMessage::test_configured_channel_is_processed\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/discord/player.py:30: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13\n    import audioop\n\ntests/unit/tasks/test_enrich_message.py::TestEnrichMessageDedup::test_url_dedup_skips_seen_url\ntests/unit/tasks/test_expand_frontier.py::TestDepthCeiling::test_below_ceiling_allows_expansion\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_resolve_urls' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeCircuitBreaker::test_open_circuit_breaker_skips_ingest\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine 'ContentDispatcher.dispatch' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/unit/tasks/test_ingest_episode.py::TestIngestEpisodeEmptyResolved::test_empty_resolved_contents_writes_message_episode\n  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine '_write_all_episodes' was never awaited\n    def __init__(self, name, parent):\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n390 passed, 6 warnings in 1.39s\n/home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine '_write_all_episodes' was never awaited\n  gc.collect()\nRuntimeWarning: Enable tracemalloc to get the object allocation traceback\n"
+        },
+        "imports": {
+          "ok": [
+            "seed_storage.enrichment.models",
+            "seed_storage.config",
+            "seed_storage.dedup",
+            "seed_storage.circuit_breaker",
+            "seed_storage.cost_tracking",
+            "seed_storage.rate_limiting",
+            "seed_storage.notifications",
+            "seed_storage.graphiti_client",
+            "seed_storage.health",
+            "seed_storage.enrichment.dispatcher",
+            "seed_storage.expansion.frontier",
+            "seed_storage.ingestion.bot",
+            "seed_storage.ingestion.batch",
+            "seed_storage.worker.app",
+            "seed_storage.worker.tasks",
+            "seed_storage.worker.dead_letters"
+          ],
+          "failed": []
+        },
+        "conventions": {
+          "violations": []
+        },
+        "production": {
+          "passed": false,
+          "deploy": {
+            "success": false,
+            "error": "Deploy failed: Credential 'openai' missing proxy_target \u2014 all env-mode credentials require proxy_target for iron-proxy. Set it via: ./infra/scripts/proxy-enable.sh openai <upstream_url>"
+          },
+          "integration": {
+            "total": 20,
+            "passed": 19,
+            "failed": 1,
+            "output": " 44%]\ntests/integration/test_circuit_breaker_redis.py::test_keys_listing PASSED [ 48%]\ntests/integration/test_dedup_redis.py::test_sadd_sismember_basic PASSED  [ 51%]\ntests/integration/test_dedup_redis.py::test_concurrent_access PASSED     [ 55%]\ntests/integration/test_dedup_redis.py::test_seen_or_mark_atomicity PASSED [ 59%]\ntests/integration/test_dedup_redis.py::test_large_set PASSED             [ 62%]\ntests/integration/test_dedup_redis.py::test_persistence_across_clients PASSED [ 66%]\ntests/integration/test_dedup_redis.py::test_isolation_between_stores PASSED [ 70%]\ntests/integration/test_graphiti.py::test_add_episode_creates_nodes FAILED [ 74%]\n\n=================================== FAILURES ===================================\n________________________ test_add_episode_creates_nodes ________________________\ntests/integration/test_graphiti.py:176: in test_add_episode_creates_nodes\n    _run(_body(), shared_event_loop)\ntests/integration/test_graphiti.py:115: in _run\n    return loop.run_until_complete(coro)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete\n    return future.result()\n           ^^^^^^^^^^^^^^^\ntests/integration/test_graphiti.py:168: in _body\n    result, _, _ = await g.driver.execute_query(\n.venv/lib/python3.12/site-packages/graphiti_core/driver/neo4j_driver.py:172: in execute_query\n    result = await self.client.execute_query(cypher_query_, parameters_=params, **kwargs)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   TypeError: neo4j._async.driver.AsyncDriver.execute_query() got multiple values for keyword argument 'parameters_'\n------------------------------ Captured log call -------------------------------\nERROR    graphiti_core.driver.neo4j_driver:neo4j_driver.py:174 Error executing Neo4j query: neo4j._async.driver.AsyncDriver.execute_query() got multiple values for keyword argument 'parameters_'\nMATCH (n) WHERE n.group_id = $gid RETURN count(n) AS cnt\n{'database_': 'neo4j'}\n=============================== warnings summary ===============================\ntests/integration/test_celery_tasks.py::test_ingest_writes_episode\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/graphiti_core/driver/search_interface/search_interface.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/integration/test_graphiti.py::test_add_episode_creates_nodes - T...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=================== 1 failed, 19 passed, 1 warning in 15.13s ===================\n"
+          },
+          "e2e": {
+            "total": 6,
+            "passed": 6,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 6 items\n\ntests/e2e/test_message_to_graph.py::test_plain_text_to_graph PASSED      [ 16%]\ntests/e2e/test_message_to_graph.py::test_youtube_url_to_graph PASSED     [ 33%]\ntests/e2e/test_message_to_graph.py::test_github_url_to_graph PASSED      [ 50%]\ntests/e2e/test_message_to_graph.py::test_image_url_to_graph PASSED       [ 66%]\ntests/e2e/test_message_to_graph.py::test_pdf_url_to_graph PASSED         [ 83%]\ntests/e2e/test_message_to_graph.py::test_multi_url_to_graph PASSED       [100%]\n\n=============================== warnings summary ===============================\ntests/e2e/test_message_to_graph.py::test_plain_text_to_graph\n  /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/lib/python3.12/site-packages/graphiti_core/driver/search_interface/search_interface.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    class SearchInterface(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=================== 6 passed, 1 warning in 80.83s (0:01:20) ====================\n"
+          },
+          "security": {
+            "total": 9,
+            "passed": 9,
+            "failed": 0,
+            "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge/.venv/bin/python3\ncachedir: .pytest_cache\nrootdir: /home/wyler-zahm/Desktop/cruse-control/seed-storage-forge\nconfigfile: pyproject.toml\nplugins: asyncio-1.3.0, Faker-40.15.0, anyio-4.13.0\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 9 items\n\ntests/security/test_credential_isolation.py::test_no_keys_in_startup_logs PASSED [ 11%]\ntests/security/test_credential_isolation.py::test_no_keys_in_task_logs PASSED [ 22%]\ntests/security/test_credential_isolation.py::test_masking_format PASSED  [ 33%]\ntests/security/test_credential_isolation.py::test_bot_token_absent_from_logs PASSED [ 44%]\ntests/security/test_injection.py::test_sql_injection_in_content PASSED   [ 55%]\ntests/security/test_injection.py::test_xss_in_content PASSED             [ 66%]\ntests/security/test_injection.py::test_ssti_in_content PASSED            [ 77%]\ntests/security/test_injection.py::test_oversized_payload PASSED          [ 88%]\ntests/security/test_injection.py::test_unicode_edge_cases PASSED         [100%]\n\n============================== 9 passed in 0.40s ===============================\n"
+          }
+        }
+      },
+      "constraints": [
+        "FIX DEPLOY: Deploy failed: Credential 'openai' missing proxy_target \u2014 all env-mode credentials require proxy_target for iron-proxy. Set it via: ./infra/scripts/proxy-enable.sh openai <upstream_url>",
+        "FIX INTEGRATION: tests/integration/test_graphiti.py::test_add_episode_creates_nodes FAILED [ 74%]",
+        "FIX INTEGRATION: ERROR    graphiti_core.driver.neo4j_driver:neo4j_driver.py:174 Error executing Neo4j query: neo4j._async.driver.AsyncDriver.execute_query() got multiple values for keyword argument 'parameters_'",
+        "FIX INTEGRATION: FAILED tests/integration/test_graphiti.py::test_add_episode_creates_nodes - T..."
+      ],
+      "started_at": "2026-04-18T23:11:18.947519+00:00",
+      "finished_at": "2026-04-18T23:46:10.813689+00:00"
+    }
+  ],
+  "started_at": "2026-04-18T09:09:34.469604+00:00"
+}

@@ -1,0 +1,66 @@
+[project]
+name = "seed-storage"
+version = "0.2.0"
+description = "CruseControl knowledge graph — Discord to Neo4j via Graphiti"
+requires-python = ">=3.12"
+dependencies = [
+    # Configuration
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    # Graph / LLM
+    "graphiti-core>=0.3",
+    "neo4j>=5.0",
+    "openai>=1.0",
+    # HTTP
+    "httpx>=0.27",
+    # Queue / task worker
+    "celery>=5.3",
+    "redis>=5.0",
+    # Discord
+    "discord.py>=2.3",
+    # Health endpoint
+    "aiohttp>=3.9",
+    # Staging / PostgreSQL
+    "psycopg2-binary>=2.9",
+    # Content resolvers
+    "trafilatura>=1.12",
+    "readability-lxml>=0.8",
+    "yt-dlp>=2024.1",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.0",
+    "docling>=2.0",
+    "unstructured>=0.14",
+    "openai-whisper>=20231117",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.7",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "integration: requires real Redis + Neo4j (docker-compose)",
+    "e2e: full-stack end-to-end tests (Celery eager + real infra)",
+    "security: security-focused tests (injection, credential isolation)",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501"]
+
+[dependency-groups]
+dev = [
+    "psycopg2-binary>=2.9.11",
+]

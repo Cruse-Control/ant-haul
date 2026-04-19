@@ -1,0 +1,53 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
+  neo4j:
+    image: neo4j:5-community
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/localdev
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_server_config_strict__validation_enabled: "false"
+      NEO4J_dbms_security_procedures_unrestricted: "apoc.*,gds.*"
+      NEO4J_dbms_security_procedures_allowlist: "apoc.*,gds.*"
+    volumes:
+      - neo4j-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7474"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  neo4j-test:
+    image: neo4j:5-community
+    ports:
+      - "7475:7474"
+      - "7688:7687"
+    environment:
+      NEO4J_AUTH: neo4j/testpass
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_server_config_strict__validation_enabled: "false"
+      NEO4J_dbms_security_procedures_unrestricted: "apoc.*,gds.*"
+      NEO4J_dbms_security_procedures_allowlist: "apoc.*,gds.*"
+    volumes:
+      - neo4j-test-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7474"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  redis-data:
+  neo4j-data:
+  neo4j-test-data:

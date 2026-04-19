@@ -1,0 +1,30 @@
+{
+  "id": "ant-food-watcher",
+  "name": "Ant Food Watcher",
+  "description": "Discord watcher: auto-detects URLs in all ant-food channels, extracts content by platform, stages into seed-storage knowledge graph. Part of the seed-storage project.",
+  "type": "daemon",
+  "owner": "flynn-cruse",
+  "source": {
+    "type": "git",
+    "repo": "https://github.com/Cruse-Control/seed-storage.git",
+    "ref": "main"
+  },
+  "entry_point": "python -m ingestion.run_watcher",
+  "health_check_path": "/health",
+  "health_check_port": 8081,
+  "credentials": ["discord-bot-ant-farm"],
+  "env": {
+    "ANALYZER_BASE_URL": "http://instagram-video-analyzer.ant-keeper.svc.cluster.local:8000",
+    "PG_DSN": "postgresql://taskman:postgres@postgres.ant-keeper.svc.cluster.local:5432/task_manager",
+    "NEO4J_URI": "bolt://neo4j.ant-keeper.svc.cluster.local:7687",
+    "WATCHED_CHANNELS": "1487357825087701063,1487648814280998963,1489132846131052627,1489204533337788476,1488084249188765796,1488083965389836369,1487354063749382234,1489826423643308203,1490082833627218112,1490083051496280145,1490083131921797220,1487576638269948167"
+  },
+  "alert_channels": [],
+  "resources": {
+    "cpu": "250m",
+    "memory": "256Mi"
+  },
+  "enabled": true,
+  "version": "1.0.0",
+  "author": "flynn-cruse"
+}
