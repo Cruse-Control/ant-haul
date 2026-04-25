@@ -18,9 +18,6 @@ import json
 import logging
 import os
 
-import anthropic as anthropic_module
-from anthropic import AsyncAnthropic
-
 from ingestion import discord_touch
 from seed_storage import staging
 from seed_storage.config import DISCORD_OPS_ALERTS_CHANNEL, TINY_CONTENT_CHARS
@@ -29,7 +26,7 @@ log = logging.getLogger("enricher")
 
 
 class _CreditExhausted(Exception):
-    """Raised when Anthropic credit is exhausted — signals batch to stop."""
+    """Raised when LLM credit is exhausted — signals batch to stop."""
 
 ENRICHER_SYSTEM = """\
 You categorize knowledge content for a technology-focused knowledge graph.
@@ -105,6 +102,45 @@ def init_tags_table():
         conn.commit()
 
 
+def _build_llm_client():
+    """Build an async LLM client based on LLM_PROVIDER setting."""
+    from seed_storage import config
+
+    provider = config.settings.LLM_PROVIDER
+    api_key = config.LLM_API_KEY
+
+    if provider == "anthropic":
+        from anthropic import AsyncAnthropic
+        return AsyncAnthropic(api_key=api_key), "anthropic"
+
+    # Default: OpenAI-compatible
+    from openai import AsyncOpenAI
+    return AsyncOpenAI(api_key=api_key), "openai"
+
+
+async def _llm_chat(client, provider: str, system: str, user_msg: str, model: str) -> str:
+    """Provider-agnostic LLM chat call. Returns the raw text response."""
+    if provider == "anthropic":
+        resp = await client.messages.create(
+            model=model,
+            max_tokens=300,
+            system=system,
+            messages=[{"role": "user", "content": user_msg}],
+        )
+        return resp.content[0].text.strip()
+
+    # OpenAI-compatible
+    resp = await client.chat.completions.create(
+        model=model,
+        max_tokens=300,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user_msg},
+        ],
+    )
+    return (resp.choices[0].message.content or "").strip()
+
+
 async def enrich_batch(limit: int = 50, concurrency: int = 5):
     """Enrich a batch of processed items with metadata."""
     items = staging.get_staged(status="processed", limit=limit)
@@ -121,10 +157,11 @@ async def enrich_batch(limit: int = 50, concurrency: int = 5):
         return
 
     init_tags_table()
-    anthropic = AsyncAnthropic(api_key=config.LLM_API_KEY)
+    client, provider = _build_llm_client()
     existing_tags = _get_existing_tags()
 
-    log.info("Enriching %d items (concurrency=%d, %d existing tags)", len(items), concurrency, len(existing_tags))
+    log.info("Enriching %d items (concurrency=%d, %d existing tags, provider=%s)",
+             len(items), concurrency, len(existing_tags), provider)
 
     sem = asyncio.Semaphore(concurrency)
     credit_error = asyncio.Event()
@@ -136,8 +173,8 @@ async def enrich_batch(limit: int = 50, concurrency: int = 5):
             if credit_error.is_set():
                 return
             try:
-                await enrich_one(item, anthropic, existing_tags)
-            except (anthropic_module.AuthenticationError, _CreditExhausted):
+                await enrich_one(item, client, provider, existing_tags)
+            except _CreditExhausted:
                 log.error("Credit/auth error — stopping remaining enrichments")
                 credit_error.set()
 
@@ -147,12 +184,13 @@ async def enrich_batch(limit: int = 50, concurrency: int = 5):
 
 async def enrich_one(
     item: dict,
-    anthropic: AsyncAnthropic,
+    client,
+    provider: str,
     existing_tags: list[str],
 ) -> None:
     """Enrich a single processed item — add tags, summary, curator attribution.
 
-    Updates the staging table directly (status → 'enriched' or 'failed').
+    Updates the staging table directly (status -> 'enriched' or 'failed').
     Can be called from enrich_batch() or express_ingest().
     """
     item_id = str(item["id"])
@@ -178,7 +216,7 @@ async def enrich_one(
         return
 
     try:
-        enrichment = await _enrich_one(anthropic, item, existing_tags)
+        enrichment = await _enrich_one(client, provider, item, existing_tags)
 
         # Merge enrichment into existing metadata.
         # Do NOT overwrite published_at or speakers — those come from the processor.
@@ -213,44 +251,34 @@ async def enrich_one(
                 if t not in existing_tags:
                     existing_tags.append(t)
 
-        log.info("Enriched [%s] %s → tags=%s", item["source_type"], item["source_uri"], new_tags)
+        log.info("Enriched [%s] %s -> tags=%s", item["source_type"], item["source_uri"], new_tags)
         await discord_touch.react(item, "enriched")
 
-    except anthropic_module.AuthenticationError as exc:
-        log.error("URGENT: Auth error in enricher for %s: %s", item.get("source_uri"), exc)
-        staging.update_status([item_id], "failed")
-        staging.trip_breaker(f"ENRICHER_AUTH: {str(exc)[:200]}", cooldown_hours=None)
-        await discord_touch.alert(
-            DISCORD_OPS_ALERTS_CHANNEL,
-            "URGENT: Auth Error — seed-storage enricher",
-            f"Anthropic authentication failed during enrichment.\n**Item:** {item.get('source_uri')}\n**Error:** {str(exc)[:300]}",
-            urgent=True,
-        )
-        raise  # Stop the batch
+    except Exception as exc:
+        exc_str = str(exc).lower()
+        if "authentication" in exc_str or "invalid api key" in exc_str:
+            log.error("URGENT: Auth error in enricher for %s: %s", item.get("source_uri"), exc)
+            staging.update_status([item_id], "failed")
+            staging.trip_breaker(f"ENRICHER_AUTH: {str(exc)[:200]}", cooldown_hours=None)
+            raise _CreditExhausted(str(exc))
 
-    except anthropic_module.RateLimitError as exc:
-        if "credit balance" in str(exc).lower():
+        if "credit" in exc_str or "insufficient_quota" in exc_str or "billing" in exc_str:
             log.error("URGENT: Credit exhaustion in enricher: %s", exc)
             staging.update_status([item_id], "failed")
             staging.trip_breaker(f"ENRICHER_CREDIT: {str(exc)[:200]}", cooldown_hours=None)
-            await discord_touch.alert(
-                DISCORD_OPS_ALERTS_CHANNEL,
-                "URGENT: Credit Exhaustion — seed-storage enricher",
-                f"Anthropic credit exhausted during enrichment.\n**Error:** {str(exc)[:300]}",
-                urgent=True,
-            )
-            raise _CreditExhausted(str(exc))  # Stop the batch
-        # Regular rate limit — fail this item, continue batch
-        log.warning("Rate limit in enricher, marking failed: %s", item.get("source_uri"))
-        staging.update_status([item_id], "failed")
+            raise _CreditExhausted(str(exc))
 
-    except Exception:
+        if "rate" in exc_str and "limit" in exc_str:
+            log.warning("Rate limit in enricher, marking failed: %s", item.get("source_uri"))
+            staging.update_status([item_id], "failed")
+            return
+
         log.exception("Failed to enrich [%s] %s", item["source_type"], item["source_uri"])
         staging.update_status([item_id], "failed")
 
 
-async def _enrich_one(anthropic: AsyncAnthropic, item: dict, existing_tags: list[str]) -> dict:
-    """Call Haiku to enrich a single item."""
+async def _enrich_one(client, provider: str, item: dict, existing_tags: list[str]) -> dict:
+    """Call LLM to enrich a single item (provider-agnostic)."""
     content = (item.get("raw_content") or "")[:3000]
     source_type = item.get("source_type", "unknown")
     author = item.get("author", "unknown")
@@ -267,15 +295,9 @@ async def _enrich_one(anthropic: AsyncAnthropic, item: dict, existing_tags: list
 
     from seed_storage import config
 
-    resp = await anthropic.messages.create(
-        model=config.LLM_MODEL,
-        max_tokens=300,
-        system=prompt,
-        messages=[{"role": "user", "content": user_msg}],
-    )
+    raw = await _llm_chat(client, provider, prompt, user_msg, config.LLM_MODEL)
 
     try:
-        raw = resp.content[0].text.strip()
         # Strip markdown code fences if present.
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
@@ -288,7 +310,7 @@ async def _enrich_one(anthropic: AsyncAnthropic, item: dict, existing_tags: list
             "summary": data.get("summary", ""),
         }
     except (json.JSONDecodeError, IndexError):
-        log.warning("Enricher returned non-JSON for %s: %s", item.get("source_uri"), resp.content[0].text[:100])
+        log.warning("Enricher returned non-JSON for %s: %s", item.get("source_uri"), raw[:100])
         return {"tags": [], "summary": ""}
 
 

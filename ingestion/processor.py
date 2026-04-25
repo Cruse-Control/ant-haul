@@ -102,7 +102,15 @@ async def process_one(
             content, meta = await _process_x(http, source_uri)
         elif source_type == "web":
             content, meta = await _process_web(http, source_uri)
-        elif source_type in ("plain_text", "discord_link", "media_link", "instagram_image"):
+        elif source_type == "instagram_image":
+            content, meta = await _process_instagram_image(http, source_uri)
+        elif source_type == "conversation_thread":
+            # Threaded conversations already have merged content — passthrough.
+            content = item["raw_content"]
+            meta = item.get("metadata") or {}
+            if isinstance(meta, str):
+                meta = json.loads(meta)
+        elif source_type in ("plain_text", "discord_link", "media_link"):
             content = item["raw_content"]
             meta = {}
         else:
@@ -157,6 +165,56 @@ async def _process_instagram(
         return f"{transcript}\n\n---\nVisual Analysis:\n{rich}", meta
 
     return transcript, meta
+
+
+async def _process_instagram_image(
+    http: httpx.AsyncClient, url: str
+) -> tuple[str, dict]:
+    """Extract Instagram image post caption via instaloader (no auth required)."""
+    shortcode = _extract_instagram_shortcode(url)
+    if not shortcode:
+        return f"[Instagram image post — could not parse shortcode] {url}", {}
+
+    try:
+        import instaloader
+
+        loader = instaloader.Instaloader()
+        post = instaloader.Post.from_shortcode(loader.context, shortcode)
+
+        caption = (post.caption or "").strip()
+        owner = post.owner_username or ""
+        likes = post.likes
+        date = post.date_utc
+
+        if caption:
+            content = f"Instagram post by @{owner}:\n\n{caption}"
+        else:
+            content = f"Instagram post by @{owner} (no caption)"
+
+        meta: dict = {}
+        if owner:
+            meta["author"] = f"@{owner}"
+            meta["speakers"] = [{"name": f"@{owner}", "role": "author", "platform": "instagram"}]
+        if date:
+            meta["published_at"] = date.isoformat()
+        if likes:
+            meta["engagement"] = {"likes": likes}
+        return content, meta
+
+    except Exception:
+        log.warning("Instaloader failed for %s, falling back to context", url, exc_info=True)
+
+    return f"[Instagram image post] {url}", {}
+
+
+def _extract_instagram_shortcode(url: str) -> str:
+    """Extract Instagram shortcode from /p/SHORTCODE/ or /reel/SHORTCODE/ URLs."""
+    parsed = urlparse(url)
+    parts = [p for p in parsed.path.split("/") if p]
+    for i, p in enumerate(parts):
+        if p in ("p", "reel", "reels") and i + 1 < len(parts):
+            return parts[i + 1]
+    return ""
 
 
 async def _process_youtube(
@@ -246,35 +304,84 @@ async def _process_github(http: httpx.AsyncClient, url: str) -> tuple[str, dict]
 
 
 async def _process_x(http: httpx.AsyncClient, url: str) -> tuple[str, dict]:
-    """Readability extraction for X/Twitter."""
-    author = ""
-    parts = url.split("/")
+    """Tweet extraction via FxTwitter API (free, no auth required)."""
+    username, tweet_id = _extract_tweet_info(url)
+    if not tweet_id:
+        return f"[Could not parse tweet ID from {url}]", {}
+
+    # FxTwitter requires username in the path and a User-Agent header.
+    fx_path = f"{username}/status/{tweet_id}" if username else f"i/status/{tweet_id}"
+    resp = await http.get(
+        f"https://api.fxtwitter.com/{fx_path}",
+        timeout=30,
+        headers={"User-Agent": "SeedStorage/1.0", "Accept": "application/json"},
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    tweet = data.get("tweet", {})
+
+    author = tweet.get("author", {})
+    author_name = author.get("name", "")
+    author_handle = f"@{author.get('screen_name', '')}"
+    text = tweet.get("text", "")
+
+    content_parts = [f"Tweet by {author_name} ({author_handle}):", "", text]
+
+    # Include media descriptions if present.
+    media = tweet.get("media", {})
+    if media:
+        for photo in media.get("photos", []):
+            alt = photo.get("altText", "")
+            if alt:
+                content_parts.append(f"\n[Image: {alt}]")
+        for video in media.get("videos", []):
+            dur = video.get("duration", 0)
+            content_parts.append(f"\n[Video: {dur}s]")
+
+    # Include quote tweet if present.
+    quote = tweet.get("quote", {})
+    if quote:
+        q_author = quote.get("author", {})
+        q_name = q_author.get("name", "")
+        q_handle = f"@{q_author.get('screen_name', '')}"
+        content_parts.append(f"\nQuoting {q_name} ({q_handle}):")
+        content_parts.append(quote.get("text", ""))
+
+    content = "\n".join(content_parts)
+
+    meta: dict = {
+        "author": author_handle,
+        "author_name": author_name,
+        "tweet_id": tweet_id,
+        "speakers": [{"name": author_name or author_handle, "role": "author", "platform": "x.com"}],
+    }
+    created_at = tweet.get("created_at")
+    if created_at:
+        meta["published_at"] = created_at
+    likes = tweet.get("likes", 0)
+    retweets = tweet.get("retweets", 0)
+    if likes or retweets:
+        meta["engagement"] = {"likes": likes, "retweets": retweets}
+
+    return content, meta
+
+
+def _extract_tweet_info(url: str) -> tuple[str, str]:
+    """Extract (username, tweet_id) from x.com or twitter.com URL.
+
+    Returns ("", "") if the URL can't be parsed.
+    """
+    parts = url.rstrip("/").split("/")
+    username = ""
+    tweet_id = ""
     for i, p in enumerate(parts):
         if p in ("x.com", "twitter.com") and i + 1 < len(parts):
-            author = f"@{parts[i + 1]}"
-            break
-
-    try:
-        from readability import Document
-        from bs4 import BeautifulSoup
-
-        resp = await http.get(url, follow_redirects=True)
-        resp.raise_for_status()
-        doc = Document(resp.text)
-        soup = BeautifulSoup(doc.summary(), "lxml")
-        text = soup.get_text(separator="\n", strip=True)
-        if len(text) > 50:
-            return text, {
-                "author": author,
-                "speakers": [{"name": author, "role": "author", "platform": "x.com"}] if author else [],
-            }
-    except Exception:
-        pass
-
-    return f"[Tweet by {author}] {url}", {
-        "author": author,
-        "speakers": [{"name": author, "role": "author", "platform": "x.com"}] if author else [],
-    }
+            username = parts[i + 1]
+        if p == "status" and i + 1 < len(parts):
+            tid = parts[i + 1].split("?")[0]
+            if tid.isdigit():
+                tweet_id = tid
+    return username, tweet_id
 
 
 async def _process_web(http: httpx.AsyncClient, url: str) -> tuple[str, dict]:

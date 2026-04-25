@@ -135,3 +135,48 @@ def get_vision_client() -> Any:
     import openai
 
     return openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+
+
+# ---------------------------------------------------------------------------
+# Convenience wrappers used by v1 ingestion code (loader.py, test_pipeline.py)
+# ---------------------------------------------------------------------------
+
+
+async def add_episode(
+    *,
+    name: str,
+    content: str,
+    source: str = "text",
+    source_description: str = "",
+    reference_time: Any = None,
+) -> None:
+    """Add an episode to the knowledge graph via Graphiti."""
+    from graphiti_core.nodes import EpisodeType
+
+    g = await get_graphiti()
+    await g.add_episode(
+        name=name,
+        episode_body=content,
+        source=EpisodeType.text,
+        source_description=source_description,
+        reference_time=reference_time,
+        group_id=GROUP_ID,
+    )
+
+
+async def close() -> None:
+    """Close the Graphiti singleton and release connections."""
+    global _graphiti, _loop_id
+    if _graphiti:
+        try:
+            await _graphiti.close()
+        except Exception:
+            pass
+        _graphiti = None
+        _loop_id = None
+
+
+async def search(query: str, limit: int = 10) -> list:
+    """Search the knowledge graph."""
+    g = await get_graphiti()
+    return await g.search(query, group_ids=[GROUP_ID], num_results=limit)

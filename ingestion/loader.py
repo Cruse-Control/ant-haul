@@ -16,6 +16,8 @@ import uuid
 from datetime import datetime, timezone
 from enum import Enum
 
+import json
+
 from ingestion import discord_touch
 from seed_storage import staging
 from seed_storage.config import (
@@ -137,6 +139,83 @@ def _estimate_cost(token_count: int) -> float:
     return input_cost + output_cost + embed_cost
 
 
+# ── Content Quality Gate (#12) ────────────────────────────────────────
+
+_AUTH_WALL_PATTERNS = [
+    "sign in to", "log in to", "create an account",
+    "please enable javascript", "access denied",
+    "403 forbidden", "404 not found",
+    "just a moment...", "checking your browser",
+    "you need to enable javascript", "verify you are human",
+]
+
+
+def _is_loadable(content: str, source_type: str) -> tuple[bool, str]:
+    """Quality gate — reject garbage content before Graphiti ingestion.
+
+    Returns (is_loadable, reason).
+    """
+    stripped = content.strip()
+    if not stripped or len(stripped) < 20:
+        return False, "content_too_short"
+
+    lower = stripped.lower()
+
+    # Auth/login walls (only reject if content is short — real articles may mention login)
+    if len(stripped) < 500:
+        for pattern in _AUTH_WALL_PATTERNS:
+            if pattern in lower:
+                return False, f"auth_wall:{pattern}"
+
+    # Cookie consent / GDPR walls
+    if lower.count("cookie") > 3 and len(stripped) < 300:
+        return False, "cookie_wall"
+
+    # Stub content like "[Tweet by @author] URL" from old failed extractors
+    if stripped.startswith("[") and stripped.endswith("]") and len(stripped) < 100:
+        return False, "stub_content"
+
+    # Stub fallbacks from old X/Twitter resolver
+    if stripped.startswith("[Tweet by") and "http" in stripped and len(stripped) < 200:
+        return False, "tweet_stub"
+
+    # X/Twitter "Something went wrong" error pages (old scraper failures)
+    if "something went wrong" in lower and "try again" in lower:
+        return False, "scrape_error_page"
+
+    return True, "ok"
+
+
+def _build_enriched_content(content: str, metadata: dict) -> str:
+    """Prepend enrichment metadata (tags, summary, speakers) to episode body.
+
+    This ensures Graphiti sees the metadata during entity extraction,
+    improving entity resolution and graph quality.
+    """
+    header_parts = []
+    tags = metadata.get("tags", [])
+    summary = metadata.get("summary", "")
+    speakers = metadata.get("speakers", [])
+
+    if tags and tags != ["uncategorized"]:
+        header_parts.append(f"Tags: {', '.join(tags)}")
+    if summary:
+        header_parts.append(f"Summary: {summary}")
+    if speakers:
+        speaker_strs = []
+        for s in speakers:
+            name = s.get("name", "")
+            role = s.get("role", "")
+            if name:
+                speaker_strs.append(f"{name} ({role})" if role else name)
+        if speaker_strs:
+            header_parts.append(f"Speakers: {', '.join(speaker_strs)}")
+
+    if header_parts:
+        return "\n".join(header_parts) + "\n\n" + content
+    return content
+
+
 # ── Batch Loading ─────────────────────────────────────────────────────
 
 async def load_batch(limit: int = 200, dry_run: bool = False, concurrency: int = 5):
@@ -208,6 +287,13 @@ async def load_batch(limit: int = 200, dry_run: bool = False, concurrency: int =
             source_uri = item["source_uri"]
             content = item["raw_content"] or ""
 
+            # Quality gate (#12) — reject garbage before expensive Graphiti call.
+            loadable, reason = _is_loadable(content, source_type)
+            if not loadable:
+                log.info("Rejected [%s] %s — %s", source_type, source_uri, reason)
+                staging.update_status([item_id], "rejected")
+                return
+
             # Content-hash dedup.
             h = _content_hash(content)
             async with seen_lock:
@@ -219,12 +305,18 @@ async def load_batch(limit: int = 200, dry_run: bool = False, concurrency: int =
                     return
                 seen_hashes.add(h)
 
+            # Enrich content with metadata (#10) — prepend tags/summary/speakers.
+            meta = item.get("metadata") or {}
+            if isinstance(meta, str):
+                meta = json.loads(meta)
+            enriched_content = _build_enriched_content(content, meta)
+
             # Single attempt — Graphiti handles retries internally (4x with backoff).
             channel = item.get("channel", "")
             try:
                 await add_episode(
                     name=source_uri,
-                    content=content,
+                    content=enriched_content,
                     source="text",
                     source_description=f"{source_type} from #{channel}" if channel else source_type,
                     reference_time=item.get("created_at") or datetime.now(timezone.utc),
