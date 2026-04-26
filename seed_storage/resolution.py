@@ -89,11 +89,16 @@ def llm_judge_same_entity(entity_a: str, desc_a: str,
     response = client.chat.completions.create(
         model=settings.EXTRACTION_MODEL,
         messages=[
-            {"role": "system", "content": "Answer YES or NO only."},
+            {"role": "system", "content": (
+                "You determine whether two entity references refer to the same real-world entity. "
+                "Answer YES only if they are definitely the same entity. Answer NO if they are "
+                "different entities, even if related (e.g. a company and its product are different entities). "
+                "Answer YES or NO only."
+            )},
             {"role": "user", "content": (
                 f"Are these the same entity?\n\n"
-                f"Entity A: {entity_a}\nDescription: {desc_a}\n\n"
-                f"Entity B: {entity_b}\nDescription: {desc_b}\n\n"
+                f"Entity A: {entity_a}\n{desc_a}\n\n"
+                f"Entity B: {entity_b}\n{desc_b}\n\n"
                 f"Answer YES or NO."
             )},
         ],
@@ -151,21 +156,41 @@ async def resolve_entity(
     if not candidates:
         return {"action": "create", "canonical_name": canonical}
 
-    best = candidates[0]
+    # Filter candidates: never merge across incompatible entity types.
+    # Organization≠Product, Person≠Organization, Person≠Product, etc.
+    _COMPATIBLE_TYPES = {
+        "Person": {"Person"},
+        "Organization": {"Organization"},
+        "Product": {"Product"},
+        "Concept": {"Concept", "Product"},  # Concept↔Product sometimes overlap
+        "Location": {"Location"},
+        "Event": {"Event"},
+    }
+    compatible = _COMPATIBLE_TYPES.get(entity.entity_type, {entity.entity_type})
+    type_filtered = [c for c in candidates if c["entity_type"] in compatible]
 
-    # Exact canonical match -- always merge
+    # Fall back to unfiltered if nothing matches type-wise
+    best_pool = type_filtered if type_filtered else candidates
+    best = best_pool[0]
+
+    # Exact canonical match -- always merge (regardless of type)
     if best["canonical_name"] == canonical:
         return {"action": "merge", "existing_id": best["id"], "canonical_name": canonical}
 
-    # High confidence -- merge without LLM
-    if best["score"] >= settings.ENTITY_AMBIGUOUS_THRESHOLD:
+    # Also check unfiltered for exact canonical match
+    for c in candidates:
+        if c["canonical_name"] == canonical:
+            return {"action": "merge", "existing_id": c["id"], "canonical_name": canonical}
+
+    # High confidence -- merge without LLM (only within compatible types)
+    if best in type_filtered and best["score"] >= settings.ENTITY_AMBIGUOUS_THRESHOLD:
         log.info("Tier 2 merge (score=%.3f): '%s' -> '%s'",
                  best["score"], entity.name, best["name"])
         return {"action": "merge", "existing_id": best["id"],
                 "canonical_name": best["canonical_name"]}
 
-    # Ambiguous band -- Tier 3 LLM judge
-    if best["score"] >= settings.ENTITY_SIMILARITY_THRESHOLD:
+    # Ambiguous band -- Tier 3 LLM judge (only within compatible types)
+    if best in type_filtered and best["score"] >= settings.ENTITY_SIMILARITY_THRESHOLD:
         try:
             is_same = llm_judge_same_entity(
                 entity.name, entity.description,
