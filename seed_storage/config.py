@@ -236,8 +236,21 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-# Backwards-compat module-level alias used by v1 staging.py
+# Backwards-compat module-level aliases used by v1 ingestion code
 PG_DSN = settings.PG_DSN
+LLM_API_KEY = settings.llm_api_key
+LLM_MODEL = settings.LLM_MODEL
+NEO4J_URI = settings.NEO4J_URI
+NEO4J_USER = settings.NEO4J_USER
+NEO4J_PASSWORD = settings.NEO4J_PASSWORD
+
+# Pipeline constants
+BATCH_COST_CEILING_USD: float = 2.00
+CIRCUIT_BREAKER_THRESHOLD: int = 5
+TINY_CONTENT_CHARS: int = 20
+
+# Discord ops channel for alerts (empty = alerts disabled)
+DISCORD_OPS_ALERTS_CHANNEL: str = ""
 
 
 # ---------------------------------------------------------------------------
