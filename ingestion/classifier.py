@@ -19,18 +19,39 @@ class Platform(str, Enum):
 
 # Order matters — first match wins.
 _PATTERNS: list[tuple[re.Pattern, Platform]] = [
-    (re.compile(r"https?://(www\.)?instagram\.com/(reel|reels)/"), Platform.INSTAGRAM),
-    (re.compile(r"https?://(www\.)?instagram\.com/p/"), Platform.INSTAGRAM_IMAGE),
+    # Instagram — username may appear before /reel/ or /p/ in the path.
+    (re.compile(r"https?://(www\.)?instagram\.com/(.+/)?(reel|reels)/"), Platform.INSTAGRAM),
+    (re.compile(r"https?://(www\.)?instagram\.com/(.+/)?p/"), Platform.INSTAGRAM_IMAGE),
+    # YouTube — full videos, shorts, and youtu.be short links.
     (re.compile(r"https?://(www\.)?(youtube\.com/watch|youtu\.be/)"), Platform.YOUTUBE),
     (re.compile(r"https?://(www\.)?(youtube\.com/shorts/)"), Platform.YOUTUBE),
-    (re.compile(r"https?://(www\.)?(x\.com|twitter\.com)/\w+/status/"), Platform.X_TWITTER),
+    # Twitter/X — including fxtwitter proxy.
+    (re.compile(r"https?://(www\.)?(x\.com|twitter\.com|fxtwitter\.com)/\w+/status/"), Platform.X_TWITTER),
+    # GitHub repos and gists.
     (re.compile(r"https?://(www\.)?github\.com/[\w\-]+/[\w\-]+"), Platform.GITHUB),
+    (re.compile(r"https?://gist\.github\.com/"), Platform.GITHUB),
+    # LinkedIn posts and articles.
+    (re.compile(r"https?://(www\.)?linkedin\.com/(posts|pulse|feed|in)/"), Platform.WEB),
     # Discord invite/channel links — don't scrape, just capture context.
     (re.compile(r"https?://(www\.)?discord\.(com|gg)/"), Platform.DISCORD_LINK),
-    # Media platforms where scraping gives garbage — capture context only.
+    # Media/unscrapable platforms — capture context only, don't waste HTTP calls.
     (re.compile(r"https?://(open\.)?spotify\.com/"), Platform.MEDIA_LINK),
     (re.compile(r"https?://(www\.)?tiktok\.com/"), Platform.MEDIA_LINK),
     (re.compile(r"https?://(music\.)?apple\.com/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://(www\.)?google\.com/(maps|search)"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://maps\.google\.com/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://meet\.google\.com/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://chat\.whatsapp\.com/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://share\.icloud\.com/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://media\.meta\.com/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://(www\.)?twitch\.tv/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://(www\.)?eventbrite\.com/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://tel\.meet/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://spoti\.fi/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://pbs\.twimg\.com/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://video\.twimg\.com/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://(www\.)?buymeacoffee\.com/"), Platform.MEDIA_LINK),
+    (re.compile(r"https?://account\.chase\.com/"), Platform.MEDIA_LINK),
 ]
 
 # Tracking params to strip for cleaner dedup.

@@ -14,6 +14,10 @@ import base64
 import json
 import logging
 import os
+import shutil
+import subprocess
+import sys
+import tempfile
 from urllib.parse import parse_qs, urlparse
 
 import httpx
@@ -23,6 +27,9 @@ from ingestion import discord_touch
 from seed_storage import staging
 
 log = logging.getLogger("processor")
+
+# Find yt-dlp in the same venv as this Python, or fall back to PATH.
+_YTDLP = shutil.which("yt-dlp", path=os.path.dirname(sys.executable)) or "yt-dlp"
 
 ADJUDICATOR_SYSTEM = """\
 You analyze transcripts from video content to decide if the video's visuals \
@@ -161,40 +168,66 @@ async def process_one(
 async def _process_instagram(
     http: httpx.AsyncClient, anthropic: AsyncAnthropic | None, base: str, url: str
 ) -> tuple[str, dict]:
-    """Transcript via MCP backend + adjudicator."""
-    resp = await http.post(f"{base}/api/video/analyze", json={"instagram_url": url, "analysis_type": "transcription"})
-    resp.raise_for_status()
-    job_id = resp.json().get("job_id") or resp.json().get("id")
-    transcript = await _poll_job(http, base, job_id)
+    """Instagram reel/video extraction via yt-dlp (supports Instagram natively)."""
+    content, meta = _ytdlp_extract(url)
+    if content and not content.startswith("[yt-dlp failed"):
+        return content, meta
 
-    meta: dict = {}
-    visuals_important, reason = await _adjudicate(anthropic, transcript)
-    meta["adjudicator_decision"] = visuals_important
-    meta["adjudicator_reason"] = reason
+    # Fallback: try instaloader for caption at least.
+    shortcode = _extract_instagram_shortcode(url)
+    if shortcode:
+        caption_content, caption_meta = _instaloader_extract(shortcode)
+        if caption_content and "could not" not in caption_content.lower():
+            return caption_content, caption_meta
 
-    if visuals_important:
-        resp = await http.post(f"{base}/api/video/analyze", json={"instagram_url": url, "analysis_type": "comprehensive"})
-        resp.raise_for_status()
-        rich_id = resp.json().get("job_id") or resp.json().get("id")
-        rich = await _poll_job(http, base, rich_id)
-        meta["media_analysis"] = rich
-        return f"{transcript}\n\n---\nVisual Analysis:\n{rich}", meta
-
-    return transcript, meta
+    raise RuntimeError(f"Instagram extraction failed for {url}")
 
 
 async def _process_instagram_image(
     http: httpx.AsyncClient, url: str
 ) -> tuple[str, dict]:
-    """Extract Instagram image post caption via instaloader (no auth required)."""
+    """Extract Instagram image post caption via instaloader with auth."""
     shortcode = _extract_instagram_shortcode(url)
     if not shortcode:
         return f"[Instagram image post — could not parse shortcode] {url}", {}
 
-    try:
+    content, meta = _instaloader_extract(shortcode)
+    if content and "could not" not in content.lower():
+        return content, meta
+
+    # Fallback: try yt-dlp which also supports Instagram posts.
+    content, meta = _ytdlp_extract(url)
+    if content and not content.startswith("[yt-dlp failed"):
+        return content, meta
+
+    raise RuntimeError(f"Instagram image extraction failed for {url}")
+
+
+def _instaloader_extract(shortcode: str) -> tuple[str, dict]:
+    """Extract Instagram post caption via instaloader with auth.
+
+    Runs in a thread with a 30s timeout to prevent instaloader's internal
+    retry loop from hanging forever on 403/429 responses.
+    """
+    import concurrent.futures
+
+    def _do_extract():
         import instaloader
 
-        loader = instaloader.Instaloader()
+        loader = instaloader.Instaloader(
+            max_connection_attempts=1,  # Don't retry on 403/429.
+            request_timeout=15,
+        )
+
+        # Authenticate if credentials available.
+        username = os.environ.get("INSTAGRAM_USERNAME", "")
+        password = os.environ.get("INSTAGRAM_PASSWORD", "")
+        if username and password:
+            try:
+                loader.login(username, password)
+            except Exception:
+                log.debug("Instaloader login failed, trying without auth")
+
         post = instaloader.Post.from_shortcode(loader.context, shortcode)
 
         caption = (post.caption or "").strip()
@@ -217,10 +250,16 @@ async def _process_instagram_image(
             meta["engagement"] = {"likes": likes}
         return content, meta
 
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            future = pool.submit(_do_extract)
+            return future.result(timeout=30)
+    except concurrent.futures.TimeoutError:
+        log.warning("Instaloader timed out for shortcode %s", shortcode)
     except Exception:
-        log.warning("Instaloader failed for %s, falling back to context", url, exc_info=True)
+        log.warning("Instaloader failed for shortcode %s", shortcode, exc_info=True)
 
-    return f"[Instagram image post] {url}", {}
+    return f"[Instagram post — could not extract] {shortcode}", {}
 
 
 def _extract_instagram_shortcode(url: str) -> str:
@@ -236,44 +275,144 @@ def _extract_instagram_shortcode(url: str) -> str:
 async def _process_youtube(
     http: httpx.AsyncClient, anthropic: AsyncAnthropic | None, base: str, url: str
 ) -> tuple[str, dict]:
-    """Free transcript API + adjudicator."""
+    """YouTube extraction via yt-dlp (handles videos, Shorts, and live streams)."""
     video_id = _extract_yt_id(url)
-    transcript = _get_yt_transcript(video_id)
 
-    # Extract structured metadata from YouTube Data API.
-    channel_title, published_at, video_title, video_desc = await _fetch_yt_metadata(http, video_id)
-    meta: dict = {}
-    if published_at:
-        meta["published_at"] = published_at
-    if channel_title:
-        meta["speakers"] = [{"name": channel_title, "role": "creator", "platform": "youtube"}]
+    # Primary: yt-dlp for transcript + metadata.
+    content, meta = _ytdlp_extract(url)
 
-    # Fallback: if no transcript, use title + description from YouTube API.
-    if transcript.startswith("[No transcript") and (video_title or video_desc):
-        transcript = f"# {video_title}\n\n{video_desc}" if video_desc else f"# {video_title}"
-        meta["fetch_status"] = "metadata_fallback"
-        log.info("YouTube transcript unavailable for %s, using title+description fallback", url)
+    # If yt-dlp got us nothing useful, try YouTube Data API for title+description.
+    if not content or content.startswith("[yt-dlp failed"):
+        channel_title, published_at, video_title, video_desc = await _fetch_yt_metadata(http, video_id)
+        if video_title or video_desc:
+            content = f"# {video_title}\n\n{video_desc}" if video_desc else f"# {video_title}"
+            meta["fetch_status"] = "metadata_fallback"
+            if channel_title:
+                meta["speakers"] = [{"name": channel_title, "role": "creator", "platform": "youtube"}]
+            if published_at:
+                meta["published_at"] = published_at
+        else:
+            raise RuntimeError(f"YouTube extraction failed for {url}")
 
-    visuals_important, reason = await _adjudicate(anthropic, transcript)
-    meta["adjudicator_decision"] = visuals_important
-    meta["adjudicator_reason"] = reason
+    # Adjudicator + visual analysis disabled — no video analysis service available.
+    meta["adjudicator_decision"] = False
+    meta["adjudicator_reason"] = "disabled"
 
-    if visuals_important:
-        try:
-            resp = await http.post(f"{base}/api/video/analyze", json={"url": url, "analysis_type": "visual_description"})
-            resp.raise_for_status()
-            job_id = resp.json().get("job_id") or resp.json().get("id")
-            rich = await _poll_job(http, base, job_id)
-            meta["media_analysis"] = rich
-            return f"{transcript}\n\n---\nVisual Analysis:\n{rich}", meta
-        except Exception:
-            log.warning("Visual analysis failed for %s, using transcript only", url)
+    return content, meta
 
-    return transcript, meta
+
+def _ytdlp_extract(url: str) -> tuple[str, dict]:
+    """Extract content from a URL using yt-dlp (YouTube, Instagram, Twitter, etc.).
+
+    Returns (content_text, metadata_dict). Falls back gracefully.
+    """
+    try:
+        # Get metadata + subtitles via yt-dlp.
+        result = subprocess.run(
+            [
+                _YTDLP,
+                "--skip-download",
+                "--write-subs",
+                "--write-auto-subs",
+                "--sub-langs", "en.*,en",
+                "--sub-format", "json3",
+                "--dump-json",
+                "--no-warnings",
+                "--no-playlist",
+                url,
+            ],
+            capture_output=True, text=True, timeout=60,
+        )
+
+        if result.returncode != 0:
+            log.debug("yt-dlp failed for %s: %s", url, result.stderr[:200])
+            return f"[yt-dlp failed for {url}]", {}
+
+        info = json.loads(result.stdout)
+        title = info.get("title", "")
+        description = info.get("description", "")
+        uploader = info.get("uploader", "") or info.get("channel", "")
+        upload_date = info.get("upload_date", "")
+        duration = info.get("duration", 0)
+        view_count = info.get("view_count", 0)
+        like_count = info.get("like_count", 0)
+
+        # Try to get subtitles/transcript.
+        transcript = ""
+        subs = info.get("subtitles", {}) or {}
+        auto_subs = info.get("automatic_captions", {}) or {}
+
+        # Prefer manual subs, then auto.
+        sub_data = None
+        for lang in ["en", "en-US", "en-GB"]:
+            if lang in subs:
+                sub_data = subs[lang]
+                break
+        if not sub_data:
+            for lang in ["en", "en-orig", "en-US", "en-GB"]:
+                if lang in auto_subs:
+                    sub_data = auto_subs[lang]
+                    break
+
+        # If we have subtitle URLs, try to download them.
+        if sub_data:
+            for fmt in sub_data:
+                sub_url = fmt.get("url", "")
+                if sub_url and "json3" in fmt.get("ext", ""):
+                    try:
+                        import httpx as _httpx
+                        r = _httpx.get(sub_url, timeout=15)
+                        if r.status_code == 200:
+                            sub_json = r.json()
+                            events = sub_json.get("events", [])
+                            parts = []
+                            for e in events:
+                                segs = e.get("segs", [])
+                                for s in segs:
+                                    t = s.get("utf8", "").strip()
+                                    if t and t != "\n":
+                                        parts.append(t)
+                            transcript = " ".join(parts)
+                            break
+                    except Exception:
+                        pass
+
+        # Build content.
+        parts = []
+        if title:
+            parts.append(f"# {title}")
+        if uploader:
+            parts.append(f"By: {uploader}")
+        if transcript:
+            parts.append(f"\n## Transcript\n\n{transcript}")
+        elif description:
+            parts.append(f"\n## Description\n\n{description}")
+
+        content = "\n".join(parts) if parts else ""
+
+        meta: dict = {}
+        if uploader:
+            platform = "youtube" if "youtube" in url or "youtu.be" in url else "instagram" if "instagram" in url else "web"
+            meta["speakers"] = [{"name": uploader, "role": "creator", "platform": platform}]
+        if upload_date and len(upload_date) == 8:
+            meta["published_at"] = f"{upload_date[:4]}-{upload_date[4:6]}-{upload_date[6:8]}"
+        if like_count:
+            meta["engagement"] = {"likes": like_count, "views": view_count}
+        if duration:
+            meta["duration_seconds"] = duration
+
+        return content, meta
+
+    except subprocess.TimeoutExpired:
+        log.warning("yt-dlp timed out for %s", url)
+    except Exception:
+        log.debug("yt-dlp extract failed for %s", url, exc_info=True)
+
+    return f"[yt-dlp failed for {url}]", {}
 
 
 async def _process_github(http: httpx.AsyncClient, url: str) -> tuple[str, dict]:
-    """API → README + metadata."""
+    """API → README + metadata, with auth token for rate limits and private repos."""
     parsed = urlparse(url)
     parts = [p for p in parsed.path.split("/") if p]
     if len(parts) < 2:
@@ -282,7 +421,13 @@ async def _process_github(http: httpx.AsyncClient, url: str) -> tuple[str, dict]
     owner, repo = parts[0], parts[1]
     api = f"https://api.github.com/repos/{owner}/{repo}"
 
-    resp = await http.get(api)
+    # Use auth token if available (60 → 5000 req/hr).
+    headers = {"Accept": "application/vnd.github.v3+json"}
+    token = os.environ.get("GITHUB_TOKEN", "")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    resp = await http.get(api, headers=headers)
     resp.raise_for_status()
     meta_data = resp.json()
 
@@ -295,7 +440,7 @@ async def _process_github(http: httpx.AsyncClient, url: str) -> tuple[str, dict]
     docs = {}
     for doc_path in ["readme", "contents/CLAUDE.md", "contents/AGENTS.md"]:
         try:
-            r = await http.get(f"{api}/{doc_path}")
+            r = await http.get(f"{api}/{doc_path}", headers=headers)
             if r.status_code == 200:
                 data = r.json()
                 text = base64.b64decode(data.get("content", "")).decode("utf-8", errors="replace")
@@ -365,6 +510,12 @@ async def _process_x(http: httpx.AsyncClient, url: str) -> tuple[str, dict]:
 
     content = "\n".join(content_parts)
 
+    # If content is very thin (media-only tweet), try yt-dlp for video description.
+    if len(text.strip()) < 10:
+        ytdlp_content, _ = _ytdlp_extract(url.replace("fxtwitter.com", "x.com"))
+        if ytdlp_content and not ytdlp_content.startswith("[yt-dlp"):
+            content += f"\n\n{ytdlp_content}"
+
     meta: dict = {
         "author": author_handle,
         "author_name": author_name,
@@ -383,15 +534,12 @@ async def _process_x(http: httpx.AsyncClient, url: str) -> tuple[str, dict]:
 
 
 def _extract_tweet_info(url: str) -> tuple[str, str]:
-    """Extract (username, tweet_id) from x.com or twitter.com URL.
-
-    Returns ("", "") if the URL can't be parsed.
-    """
+    """Extract (username, tweet_id) from x.com, twitter.com, or fxtwitter.com URL."""
     parts = url.rstrip("/").split("/")
     username = ""
     tweet_id = ""
     for i, p in enumerate(parts):
-        if p in ("x.com", "twitter.com") and i + 1 < len(parts):
+        if p in ("x.com", "twitter.com", "fxtwitter.com") and i + 1 < len(parts):
             username = parts[i + 1]
         if p == "status" and i + 1 < len(parts):
             tid = parts[i + 1].split("?")[0]
@@ -401,54 +549,208 @@ def _extract_tweet_info(url: str) -> tuple[str, str]:
 
 
 async def _process_web(http: httpx.AsyncClient, url: str) -> tuple[str, dict]:
-    """Readability article extraction."""
+    """Web content extraction with multiple strategies.
+
+    1. LinkedIn: cookie-based auth scraping
+    2. trafilatura (primary, better extraction than readability alone)
+    3. readability-lxml (fallback)
+    4. archive.ph (fallback for paywalled/blocked content)
+    """
+    parsed = urlparse(url)
+    hostname = (parsed.hostname or "").replace("www.", "")
+
+    # t.co shortlinks: follow redirect first, then process the target URL.
+    if hostname == "t.co":
+        try:
+            resp = await http.get(url, follow_redirects=True)
+            final_url = str(resp.url)
+            if final_url != url:
+                log.info("t.co redirect: %s → %s", url, final_url)
+                return await _process_web(http, final_url)
+        except Exception:
+            pass
+
+    # LinkedIn: use li_at session cookie for authenticated scraping.
+    if hostname == "linkedin.com":
+        return await _process_linkedin(http, url)
+
+    # Google Docs: use export trick.
+    if hostname in ("docs.google.com",):
+        return await _process_google_doc(http, url)
+
+    # Primary: trafilatura (better article extraction).
+    try:
+        import trafilatura
+
+        resp = await http.get(url, follow_redirects=True, headers={
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+        })
+        resp.raise_for_status()
+
+        extracted = trafilatura.extract(
+            resp.text,
+            include_comments=False,
+            include_tables=True,
+            favor_recall=True,
+            output_format="txt",
+        )
+
+        if extracted and len(extracted.strip()) > 50:
+            # Also get metadata.
+            meta_result = trafilatura.extract(resp.text, output_format="json")
+            meta: dict = {}
+            if meta_result:
+                try:
+                    meta_json = json.loads(meta_result) if isinstance(meta_result, str) else meta_result
+                    title = meta_json.get("title", "")
+                    author = meta_json.get("author", "")
+                    date = meta_json.get("date", "")
+                    if author:
+                        meta["author"] = author
+                        meta["speakers"] = [{"name": author, "role": "author", "platform": "web"}]
+                    if date:
+                        meta["published_at"] = date
+                    if title:
+                        meta["title"] = title
+                        return f"# {title}\n\n{extracted}", meta
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            return extracted, meta
+    except Exception:
+        log.debug("trafilatura failed for %s, trying readability", url)
+
+    # Fallback: readability-lxml.
+    try:
+        from readability import Document
+        from bs4 import BeautifulSoup
+
+        resp = await http.get(url, follow_redirects=True, headers={
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+        })
+        resp.raise_for_status()
+
+        doc = Document(resp.text)
+        title = doc.short_title() or ""
+        soup = BeautifulSoup(doc.summary(), "lxml")
+        text = soup.get_text(separator="\n", strip=True)
+
+        if text and len(text.strip()) > 50:
+            meta = {"title": title}
+            full_soup = BeautifulSoup(resp.text, "lxml")
+            for attr in [{"name": "author"}, {"property": "og:author"}, {"name": "twitter:creator"}]:
+                tag = full_soup.find("meta", attrs=attr)
+                if tag and tag.get("content"):
+                    meta["author"] = tag["content"]
+                    meta["speakers"] = [{"name": tag["content"], "role": "author", "platform": "web"}]
+                    break
+            content = f"# {title}\n\n{text}" if title else text
+            return content, meta
+    except Exception:
+        log.debug("readability failed for %s, trying archive.ph", url)
+
+    # Last resort: archive.ph for paywalled or blocked content.
+    return await _process_via_archive(http, url)
+
+
+async def _process_linkedin(http: httpx.AsyncClient, url: str) -> tuple[str, dict]:
+    """LinkedIn content extraction using li_at session cookie."""
+    li_at = os.environ.get("LINKEDIN_LI_AT", "")
+    if not li_at:
+        raise RuntimeError("No LINKEDIN_LI_AT cookie configured")
+
+    resp = await http.get(
+        url,
+        follow_redirects=True,
+        headers={
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            "Cookie": f"li_at={li_at}",
+        },
+    )
+    resp.raise_for_status()
+
+    # LinkedIn HTML is heavy — use trafilatura for extraction.
+    try:
+        import trafilatura
+        extracted = trafilatura.extract(resp.text, include_comments=False, favor_recall=True)
+        if extracted and len(extracted.strip()) > 50:
+            meta: dict = {}
+            meta_result = trafilatura.extract(resp.text, output_format="json")
+            if meta_result:
+                try:
+                    meta_json = json.loads(meta_result) if isinstance(meta_result, str) else meta_result
+                    if meta_json.get("author"):
+                        meta["author"] = meta_json["author"]
+                        meta["speakers"] = [{"name": meta_json["author"], "role": "author", "platform": "linkedin"}]
+                    if meta_json.get("title"):
+                        meta["title"] = meta_json["title"]
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            return extracted, meta
+    except Exception:
+        log.debug("trafilatura failed for LinkedIn %s", url)
+
+    # Fallback: readability on the authenticated HTML.
     from readability import Document
     from bs4 import BeautifulSoup
-
-    resp = await http.get(url, follow_redirects=True)
-    resp.raise_for_status()
 
     doc = Document(resp.text)
     title = doc.short_title() or ""
     soup = BeautifulSoup(doc.summary(), "lxml")
     text = soup.get_text(separator="\n", strip=True)
 
-    full_soup = BeautifulSoup(resp.text, "lxml")
-    author = ""
-    for attr in [{"name": "author"}, {"property": "og:author"}, {"name": "twitter:creator"}]:
-        tag = full_soup.find("meta", attrs=attr)
-        if tag and tag.get("content"):
-            author = tag["content"]
+    if text and len(text.strip()) > 50:
+        return f"# {title}\n\n{text}" if title else text, {"title": title}
+
+    raise RuntimeError(f"LinkedIn extraction failed for {url}")
+
+
+async def _process_google_doc(http: httpx.AsyncClient, url: str) -> tuple[str, dict]:
+    """Google Docs extraction via export-as-text URL trick."""
+    # Extract document ID from URL.
+    parsed = urlparse(url)
+    parts = parsed.path.split("/")
+    doc_id = ""
+    for i, p in enumerate(parts):
+        if p == "d" and i + 1 < len(parts):
+            doc_id = parts[i + 1]
             break
 
-    published_at = ""
-    for attr in [
-        {"property": "article:published_time"},
-        {"property": "og:article:published_time"},
-        {"name": "date"},
-        {"name": "publishdate"},
-    ]:
-        tag = full_soup.find("meta", attrs=attr)
-        if tag and tag.get("content"):
-            published_at = tag["content"]
-            break
+    if not doc_id:
+        raise RuntimeError(f"Could not parse Google Doc ID from {url}")
 
-    # Extract outbound links from the full HTML.
-    outbound = []
-    for a in full_soup.find_all("a", href=True):
-        href = a["href"]
-        if href.startswith("http") and len(href) < 500:
-            outbound.append(href)
+    # Try the public export endpoint.
+    export_url = f"https://docs.google.com/document/d/{doc_id}/export?format=txt"
+    resp = await http.get(export_url, follow_redirects=True)
+    resp.raise_for_status()
 
-    content = f"# {title}\n\n{text}" if title else text
-    meta = {"title": title, "author": author}
-    if published_at:
-        meta["published_at"] = published_at
-    if author:
-        meta["speakers"] = [{"name": author, "role": "author", "platform": "web"}]
-    if outbound:
-        meta["outbound_links"] = outbound[:50]
-    return content, meta
+    content = resp.text.strip()
+    if content and len(content) > 50 and "Sign in" not in content[:200]:
+        return content, {"title": f"Google Doc {doc_id[:8]}...", "source_format": "google_doc"}
+
+    raise RuntimeError(f"Google Doc export failed for {url} (may require auth)")
+
+
+async def _process_via_archive(http: httpx.AsyncClient, url: str) -> tuple[str, dict]:
+    """Try to fetch content via archive.ph (paywall bypass / cached version)."""
+    archive_url = f"https://archive.ph/newest/{url}"
+    try:
+        resp = await http.get(
+            archive_url,
+            follow_redirects=True,
+            timeout=30,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            },
+        )
+        if resp.status_code == 200 and len(resp.text) > 500:
+            import trafilatura
+            extracted = trafilatura.extract(resp.text, include_comments=False, favor_recall=True)
+            if extracted and len(extracted.strip()) > 50:
+                return extracted, {"fetch_status": "archive_ph", "archive_url": str(resp.url)}
+    except Exception:
+        log.debug("archive.ph failed for %s", url)
+
+    raise RuntimeError(f"All extraction methods failed for {url}")
 
 
 # ── YouTube metadata ───────────────────────────────────────────────
@@ -541,20 +843,6 @@ def _extract_yt_id(url: str) -> str:
             return parsed.path.split("/shorts/")[1].split("/")[0]
         return parse_qs(parsed.query).get("v", [""])[0]
     return ""
-
-
-def _get_yt_transcript(video_id: str) -> str:
-    from youtube_transcript_api import YouTubeTranscriptApi
-
-    try:
-        entries = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
-        return " ".join(e["text"] for e in entries)
-    except Exception:
-        try:
-            entries = YouTubeTranscriptApi.get_transcript(video_id)
-            return " ".join(e["text"] for e in entries)
-        except Exception:
-            return f"[No transcript available for video {video_id}]"
 
 
 if __name__ == "__main__":
