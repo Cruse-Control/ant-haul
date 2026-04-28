@@ -10,6 +10,7 @@ dependencies = [
     # Graph / LLM
     "neo4j>=5.0",
     "openai>=1.0",
+    "anthropic>=0.30",
     # HTTP
     "httpx>=0.27",
     # Queue / task worker
