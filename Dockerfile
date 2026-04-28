@@ -10,6 +10,7 @@ WORKDIR /app
 COPY pyproject.toml .
 COPY seed_storage/ seed_storage/
 COPY scripts/ scripts/
+COPY ingestion/ ingestion/
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN pip install --no-cache-dir .

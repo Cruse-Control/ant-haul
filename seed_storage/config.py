@@ -118,8 +118,9 @@ class Settings(BaseSettings):
     ENTITY_SIMILARITY_THRESHOLD: float = 0.65
     ENTITY_AMBIGUOUS_THRESHOLD: float = 0.90
 
-    # --- PostgreSQL (v1 staging table, shared with ant-keeper) ---
+    # --- PostgreSQL ---
     PG_DSN: str = "postgresql://taskman:postgres@127.0.0.1:30433/task_manager"
+    SEED_STORAGE_DSN: str = ""  # ant-keeper provisioned dedicated database
 
     # --- Log level ---
     LOG_LEVEL: str = "INFO"
@@ -190,6 +191,13 @@ class Settings(BaseSettings):
         """Default VISION_PROVIDER to LLM_PROVIDER when not explicitly set."""
         if not self.VISION_PROVIDER:
             object.__setattr__(self, "VISION_PROVIDER", self.LLM_PROVIDER)
+        return self
+
+    @model_validator(mode="after")
+    def _bridge_pg_dsn(self) -> Settings:
+        """Use SEED_STORAGE_DSN from ant-keeper when available."""
+        if self.SEED_STORAGE_DSN:
+            object.__setattr__(self, "PG_DSN", self.SEED_STORAGE_DSN)
         return self
 
     # -----------------------------------------------------------------------

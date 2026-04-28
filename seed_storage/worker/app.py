@@ -6,6 +6,7 @@ Two queues:
 
 Beat schedule:
   - scan_frontier — runs every 60 s when FRONTIER_AUTO_ENABLED=True
+  - post_daily_digest — runs daily at 12:15 UTC (06:15 MDT)
 """
 
 from __future__ import annotations
@@ -40,6 +41,7 @@ app.config_from_object(
             "seed_storage.worker.tasks.ingest_episode": {"queue": "graph_ingest"},
             "seed_storage.worker.tasks.expand_from_frontier": {"queue": "graph_ingest"},
             "seed_storage.worker.tasks.scan_frontier": {"queue": "graph_ingest"},
+            "seed_storage.worker.tasks.post_daily_digest": {"queue": "graph_ingest"},
         },
         # Queue definitions
         "task_queues": (
@@ -50,11 +52,16 @@ app.config_from_object(
         # Retry behaviour
         "task_acks_late": True,
         "task_reject_on_worker_lost": True,
-        # Beat schedule — scan_frontier every 60 s
+        # Beat schedule
         "beat_schedule": {
             "scan-frontier-every-60s": {
                 "task": "seed_storage.worker.tasks.scan_frontier",
                 "schedule": 60.0,
+                "options": {"queue": "graph_ingest"},
+            },
+            "daily-digest-1215-utc": {
+                "task": "seed_storage.worker.tasks.post_daily_digest",
+                "schedule": crontab(hour=12, minute=15),
                 "options": {"queue": "graph_ingest"},
             },
         },

@@ -674,3 +674,40 @@ def scan_frontier(self) -> int:
 def build_content_payload(resolved: ResolvedContent, meta: dict) -> dict:
     """Public alias for _build_content_payload (Contract 3)."""
     return _build_content_payload(resolved, meta)
+
+
+# ---------------------------------------------------------------------------
+# Task: post_daily_digest
+# ---------------------------------------------------------------------------
+
+
+@app.task(
+    bind=True,
+    name="seed_storage.worker.tasks.post_daily_digest",
+    queue="graph_ingest",
+    max_retries=2,
+    default_retry_delay=120,
+    acks_late=True,
+)
+def post_daily_digest(self) -> int:
+    """Beat task: post a daily summary of loaded items to Discord.
+
+    Queries seed_staging for items loaded in the last 24 hours, builds
+    a grouped summary, and posts it to #seed-storage via the bot token.
+    """
+    try:
+        from seed_storage.digest import post_digest
+
+        count = post_digest(hours=24)
+        if count:
+            logger.info("post_daily_digest: posted digest with %d items", count)
+        else:
+            logger.info("post_daily_digest: no items to digest")
+        return count
+    except Exception as exc:  # noqa: BLE001
+        logger.error("post_daily_digest: failed: %s", exc, exc_info=True)
+        try:
+            raise self.retry(exc=exc)
+        except self.MaxRetriesExceededError:
+            logger.error("post_daily_digest: max retries exceeded")
+            return 0
