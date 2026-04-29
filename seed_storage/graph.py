@@ -60,6 +60,7 @@ async def init_schema():
         "CREATE CONSTRAINT community_id IF NOT EXISTS FOR (c:__Community__) REQUIRE c.id IS UNIQUE",
         "CREATE CONSTRAINT tag_name IF NOT EXISTS FOR (t:Tag) REQUIRE t.name IS UNIQUE",
         "CREATE CONSTRAINT query_id IF NOT EXISTS FOR (q:Query) REQUIRE q.id IS UNIQUE",
+        "CREATE CONSTRAINT meta_key IF NOT EXISTS FOR (m:__Meta__) REQUIRE m.key IS UNIQUE",
     ]
 
     vector_indexes = [
@@ -89,6 +90,7 @@ async def init_schema():
         "CREATE INDEX entity_name IF NOT EXISTS FOR (e:__Entity__) ON (e.name)",
         "CREATE INDEX entity_type IF NOT EXISTS FOR (e:__Entity__) ON (e.entity_type)",
         "CREATE INDEX tag_name_idx IF NOT EXISTS FOR (t:Tag) ON (t.name)",
+        "CREATE INDEX meta_updated_at IF NOT EXISTS FOR (m:__Meta__) ON (m.updated_at)",
     ]
 
     fulltext_indexes = [
@@ -457,6 +459,55 @@ async def persist_query(
                 qid=query_id, eid=eid,
             )
     return query_id
+
+
+async def upsert_meta(
+    *,
+    key: str,
+    content: str,
+    content_type: str = "markdown",
+) -> None:
+    """Create or replace a __Meta__ node - a named document stored in the graph.
+
+    Used to persist operational documents (graph index, lint report) inside Neo4j
+    so they are accessible to any agent regardless of runtime environment.
+
+    key:          unique identifier e.g. 'graph_index', 'lint_report'
+    content:      document body (markdown text)
+    content_type: 'markdown' (default) or 'json'
+    """
+    driver = await get_driver()
+    now = _now()
+    async with driver.session() as session:
+        await session.run(
+            """
+            MERGE (m:__Meta__ {key: $key})
+            SET m.content = $content,
+                m.content_type = $content_type,
+                m.updated_at = $now
+            """,
+            key=key,
+            content=content,
+            content_type=content_type,
+            now=now,
+        )
+
+
+async def get_meta(key: str) -> dict | None:
+    """Retrieve a __Meta__ node by key. Returns None if not found.
+
+    Returns dict with keys: key, content, content_type, updated_at.
+    """
+    driver = await get_driver()
+    async with driver.session() as session:
+        result = await session.run(
+            "MATCH (m:__Meta__ {key: $key}) RETURN m {.*} AS m",
+            key=key,
+        )
+        record = await result.single()
+        if not record:
+            return None
+        return dict(record["m"])
 
 
 # -- Read operations --

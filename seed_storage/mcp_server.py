@@ -17,6 +17,7 @@ from seed_storage.graph import (
     upsert_entity, delete_entity, merge_entities,
     create_relationship, delete_relationship,
     write_synthesis, persist_query, link_source_tag,
+    get_meta,
 )
 
 log = logging.getLogger("ant-haul-mcp")
@@ -316,6 +317,32 @@ async def kg_tag_source(source_id: str, tags: list[str]) -> dict:
     for tag in tags:
         await link_source_tag(source_id=source_id, tag_name=tag.lower().strip())
     return {"tagged": len(tags), "source_id": source_id}
+
+
+@mcp.tool()
+async def kg_graph_index() -> str:
+    """Get the current graph index - entity counts, top entities, tags, synthesis coverage.
+
+    Returns the latest graph index document as markdown. Updated daily by the
+    generate_graph_index Celery beat task. Read this first before any query or write.
+    """
+    meta = await get_meta("graph_index")
+    if not meta:
+        return "Graph index not yet generated. Run: python -m scripts.generate_index"
+    return meta["content"]
+
+
+@mcp.tool()
+async def kg_lint_report() -> str:
+    """Get the latest graph health/lint report.
+
+    Returns the most recent lint report showing orphan entities, PART_OF overload,
+    synthesis candidates, tag sprawl. Updated weekly by the run_graph_lint Celery task.
+    """
+    meta = await get_meta("lint_report")
+    if not meta:
+        return "Lint report not yet generated. Run: python -m scripts.lint_graph"
+    return meta["content"]
 
 
 if __name__ == "__main__":

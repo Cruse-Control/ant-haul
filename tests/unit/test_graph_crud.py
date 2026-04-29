@@ -113,3 +113,22 @@ def test_persist_query(event_loop):
         assert qid and len(qid) > 0
         await graph.delete_entity(entity_id=eid)
     run(_body(), event_loop)
+
+
+def test_upsert_and_get_meta(event_loop):
+    async def _body():
+        await graph.upsert_meta(
+            key="test-meta-key",
+            content="# Test\n\nThis is a test.",
+            content_type="markdown",
+        )
+        result = await graph.get_meta("test-meta-key")
+        assert result is not None
+        assert result["content"] == "# Test\n\nThis is a test."
+        assert result["content_type"] == "markdown"
+        assert result["key"] == "test-meta-key"
+        # cleanup
+        driver = await graph.get_driver()
+        async with driver.session() as session:
+            await session.run("MATCH (m:__Meta__ {key: 'test-meta-key'}) DELETE m")
+    run(_body(), event_loop)
