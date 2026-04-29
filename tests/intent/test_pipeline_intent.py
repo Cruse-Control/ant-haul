@@ -66,19 +66,9 @@ def celery_eager():
 
 
 @pytest.fixture(autouse=True)
-def _reset_graphiti_singleton():
-    """Reset Graphiti singleton between tests so each gets a fresh connection."""
-    from seed_storage.graphiti_client import reset_graphiti
-
-    reset_graphiti()
-    yield
-    reset_graphiti()
-
-
-@pytest.fixture(autouse=True)
-def _clear_graphiti_circuit_breaker(redis_client):
-    """Clear stale graphiti circuit breaker state so ingestion tests aren't blocked."""
-    redis_client.delete("seed:circuit:graphiti:failures", "seed:circuit:graphiti:opened_at")
+def _clear_pipeline_circuit_breaker(redis_client):
+    """Clear stale pipeline circuit breaker state so ingestion tests aren't blocked."""
+    redis_client.delete("seed:circuit:pipeline:failures", "seed:circuit:pipeline:opened_at")
     yield
 
 

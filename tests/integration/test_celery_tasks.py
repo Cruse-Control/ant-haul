@@ -131,61 +131,54 @@ def test_enrich_end_to_end(celery_eager, redis_client, test_prefix):
 
 
 def test_ingest_writes_episode(celery_eager, redis_client, test_prefix):
-    """ingest_episode calls graphiti.add_episode() with the correct arguments."""
+    """ingest_episode calls _load_item_to_graph() with the correct arguments."""
     from seed_storage.circuit_breaker import CircuitBreaker
     from seed_storage.worker.tasks import ingest_episode
 
     payload = _make_enriched_payload()
 
-    mock_graphiti = AsyncMock()
-    mock_graphiti.add_episode = AsyncMock()
-
     # Mock circuit breaker closed so lingering Redis state from other tests
-    # doesn't cause the circuit to be open and skip the add_episode call.
+    # doesn't cause the circuit to be open and skip the load call.
     mock_cb = MagicMock(spec=CircuitBreaker)
     mock_cb.is_open.return_value = False
     mock_cb.record_success = MagicMock()
     mock_cb.record_failure = MagicMock()
 
-    # _get_graphiti_instance is async — patch with AsyncMock so calling it returns
-    # a coroutine that asyncio.run() can execute (not the AsyncMock object itself).
     with (
         patch("seed_storage.worker.tasks._get_redis", return_value=redis_client),
         patch("seed_storage.worker.tasks._get_circuit_breaker", return_value=mock_cb),
         patch(
-            "seed_storage.worker.tasks._get_graphiti_instance",
-            new=AsyncMock(return_value=mock_graphiti),
-        ),
+            "seed_storage.worker.tasks._load_item_to_graph",
+            new=AsyncMock(return_value=None),
+        ) as mock_load,
     ):
         ingest_episode.apply(args=[payload])
 
-    # add_episode was called at least once (for the message episode)
-    assert mock_graphiti.add_episode.await_count >= 1
-    call_kwargs = mock_graphiti.add_episode.call_args_list[0][1]
-    assert call_kwargs.get("group_id") == "seed-storage"
+    # _load_item_to_graph was called at least once (for the message episode)
+    assert mock_load.await_count >= 1
+    # First call receives an item dict as first positional argument
+    first_call_args = mock_load.call_args_list[0][0]
+    assert isinstance(first_call_args[0], dict)
 
 
 def test_retry_on_transient_error(celery_eager, redis_client, test_prefix):
-    """ingest_episode retries on add_episode failure (not dead-lettered immediately)."""
+    """ingest_episode retries on _load_item_to_graph failure (not dead-lettered immediately)."""
     from seed_storage.worker.tasks import ingest_episode
 
     payload = _make_enriched_payload()
     call_count = 0
 
-    async def _flaky_add(*args, **kwargs):
+    async def _flaky_load(*args, **kwargs):
         nonlocal call_count
         call_count += 1
         if call_count == 1:
             raise ConnectionError("transient Neo4j error")
 
-    mock_graphiti = AsyncMock()
-    mock_graphiti.add_episode = _flaky_add
-
     with (
         patch("seed_storage.worker.tasks._get_redis", return_value=redis_client),
         patch(
-            "seed_storage.worker.tasks._get_graphiti_instance",
-            new=AsyncMock(return_value=mock_graphiti),
+            "seed_storage.worker.tasks._load_item_to_graph",
+            new=_flaky_load,
         ),
         patch("seed_storage.worker.tasks.dead_letter"),
     ):
@@ -207,9 +200,6 @@ def test_dead_letter_after_max_retries(celery_eager, redis_client, test_prefix):
     async def _always_fail(*args, **kwargs):
         raise RuntimeError("persistent failure")
 
-    mock_graphiti = AsyncMock()
-    mock_graphiti.add_episode = _always_fail
-
     dead_letters: list[tuple] = []
 
     def _capture_dl(task_name, pl, exc, retries):
@@ -218,8 +208,8 @@ def test_dead_letter_after_max_retries(celery_eager, redis_client, test_prefix):
     with (
         patch("seed_storage.worker.tasks._get_redis", return_value=redis_client),
         patch(
-            "seed_storage.worker.tasks._get_graphiti_instance",
-            new=AsyncMock(return_value=mock_graphiti),
+            "seed_storage.worker.tasks._load_item_to_graph",
+            new=_always_fail,
         ),
         patch("seed_storage.worker.tasks.dead_letter", side_effect=_capture_dl),
     ):

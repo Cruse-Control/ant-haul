@@ -130,7 +130,7 @@ def _cleanup_group(neo4j_driver, group_id: str) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_plain_text_to_graph(redis_client, neo4j_driver_e2e, graphiti_env, clean_pipeline_redis):
+def test_plain_text_to_graph(redis_client, neo4j_driver_e2e, clean_pipeline_redis):
     """Plain text message → EpisodicNode created in Neo4j."""
     gid = f"e2e-txt-{uuid.uuid4().hex[:8]}"
     raw = _raw_payload(
@@ -145,7 +145,7 @@ def test_plain_text_to_graph(redis_client, neo4j_driver_e2e, graphiti_env, clean
         _cleanup_group(neo4j_driver_e2e, gid)
 
 
-def test_youtube_url_to_graph(redis_client, neo4j_driver_e2e, graphiti_env, clean_pipeline_redis):
+def test_youtube_url_to_graph(redis_client, neo4j_driver_e2e, clean_pipeline_redis):
     """YouTube URL → message + content EpisodicNodes written to Neo4j."""
     gid = f"e2e-yt-{uuid.uuid4().hex[:8]}"
     url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
@@ -163,7 +163,7 @@ def test_youtube_url_to_graph(redis_client, neo4j_driver_e2e, graphiti_env, clea
         _cleanup_group(neo4j_driver_e2e, gid)
 
 
-def test_github_url_to_graph(redis_client, neo4j_driver_e2e, graphiti_env, clean_pipeline_redis):
+def test_github_url_to_graph(redis_client, neo4j_driver_e2e, clean_pipeline_redis):
     """GitHub URL → message + github content EpisodicNodes in Neo4j."""
     gid = f"e2e-gh-{uuid.uuid4().hex[:8]}"
     url = "https://github.com/anthropics/anthropic-sdk-python"
@@ -181,7 +181,7 @@ def test_github_url_to_graph(redis_client, neo4j_driver_e2e, graphiti_env, clean
         _cleanup_group(neo4j_driver_e2e, gid)
 
 
-def test_image_url_to_graph(redis_client, neo4j_driver_e2e, graphiti_env, clean_pipeline_redis):
+def test_image_url_to_graph(redis_client, neo4j_driver_e2e, clean_pipeline_redis):
     """Image attachment URL → EpisodicNode with vision summary written to Neo4j."""
     gid = f"e2e-img-{uuid.uuid4().hex[:8]}"
     url = "https://example.com/architecture-diagram.png"
@@ -204,7 +204,7 @@ def test_image_url_to_graph(redis_client, neo4j_driver_e2e, graphiti_env, clean_
         _cleanup_group(neo4j_driver_e2e, gid)
 
 
-def test_pdf_url_to_graph(redis_client, neo4j_driver_e2e, graphiti_env, clean_pipeline_redis):
+def test_pdf_url_to_graph(redis_client, neo4j_driver_e2e, clean_pipeline_redis):
     """PDF URL → EpisodicNode with extracted text written to Neo4j."""
     gid = f"e2e-pdf-{uuid.uuid4().hex[:8]}"
     url = "https://arxiv.org/pdf/2401.12345.pdf"
@@ -226,7 +226,7 @@ def test_pdf_url_to_graph(redis_client, neo4j_driver_e2e, graphiti_env, clean_pi
         _cleanup_group(neo4j_driver_e2e, gid)
 
 
-def test_multi_url_to_graph(redis_client, neo4j_driver_e2e, graphiti_env, clean_pipeline_redis):
+def test_multi_url_to_graph(redis_client, neo4j_driver_e2e, clean_pipeline_redis):
     """Message with multiple URLs → message + multiple content episodes in Neo4j."""
     gid = f"e2e-multi-{uuid.uuid4().hex[:8]}"
     urls = [

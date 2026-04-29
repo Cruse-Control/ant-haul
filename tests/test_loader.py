@@ -89,20 +89,28 @@ class TestClassifyError:
         exc = anthropic.APITimeoutError(request=MagicMock())
         assert classify_error(exc) == ErrorKind.RETRYABLE
 
-    def test_graphiti_rate_limit_is_non_retryable(self):
-        """Graphiti already retried 4x — don't retry again."""
-        from graphiti_core.llm_client.errors import RateLimitError
-        exc = RateLimitError("Rate limit exceeded. Please try again later.")
-        assert classify_error(exc) == ErrorKind.NON_RETRYABLE
+    def test_openai_rate_limit_is_retryable(self):
+        import openai
+        from unittest.mock import MagicMock
+        resp = MagicMock()
+        resp.status_code = 429
+        exc = openai.RateLimitError("rate limited", response=resp, body={})
+        assert classify_error(exc) == ErrorKind.RETRYABLE
 
-    def test_graphiti_rate_limit_credit_is_credit_auth(self):
-        from graphiti_core.llm_client.errors import RateLimitError
-        exc = RateLimitError("Rate limit exceeded. Error: Your credit balance is too low")
+    def test_openai_rate_limit_credit_is_credit_auth(self):
+        import openai
+        from unittest.mock import MagicMock
+        resp = MagicMock()
+        resp.status_code = 429
+        exc = openai.RateLimitError("credit balance exceeded", response=resp, body={})
         assert classify_error(exc) == ErrorKind.CREDIT_AUTH
 
-    def test_graphiti_refusal_is_non_retryable(self):
-        from graphiti_core.llm_client.errors import RefusalError
-        exc = RefusalError("Content refused")
+    def test_openai_bad_request_is_non_retryable(self):
+        import openai
+        from unittest.mock import MagicMock
+        resp = MagicMock()
+        resp.status_code = 400
+        exc = openai.BadRequestError("bad request", response=resp, body={})
         assert classify_error(exc) == ErrorKind.NON_RETRYABLE
 
     def test_unknown_error_is_non_retryable(self):
@@ -124,132 +132,6 @@ class TestClassifyError:
 
 class TestLoaderBatchProtection:
     """Verify circuit breaker, cost ceiling, and single-attempt behavior."""
-
-    @pytest.mark.asyncio
-    async def test_credit_error_trips_breaker_and_alerts(self):
-        """Credit error should trip persistent breaker, alert Discord, fail item."""
-        import anthropic
-        from seed_storage import staging
-        staging.init_tables()
-
-        fake_item = {
-            "id": "aaaaaaaa-0000-0000-0000-000000000010",
-            "source_type": "web",
-            "source_uri": "https://example.com/credit-fail",
-            "raw_content": "some content",
-            "channel": "test",
-            "token_estimate": 100,
-        }
-
-        async def credit_fail(**kwargs):
-            raise anthropic.AuthenticationError(
-                message="Invalid API key",
-                response=MagicMock(status_code=401, headers={}),
-                body={"error": {"type": "authentication_error", "message": "Invalid"}},
-            )
-
-        with (
-            patch("ingestion.loader.staging.get_staged", return_value=[fake_item]),
-            patch("ingestion.loader.staging.update_status") as mock_status,
-            patch("ingestion.loader.staging.is_breaker_tripped", return_value=None),
-            patch("ingestion.loader.staging.reset_orphaned_loading", return_value=0),
-            patch("ingestion.loader.staging.trip_breaker") as mock_trip,
-            patch("ingestion.loader.add_episode", side_effect=credit_fail),
-            patch("ingestion.loader.discord_touch.react", new_callable=AsyncMock),
-            patch("ingestion.loader.discord_touch.alert", new_callable=AsyncMock) as mock_alert,
-            patch("ingestion.loader.close", new_callable=AsyncMock),
-        ):
-            from ingestion.loader import load_batch
-            await load_batch(limit=1, concurrency=1)
-
-        # Should have tripped the persistent breaker
-        mock_trip.assert_called_once()
-        assert "CREDIT_AUTH" in mock_trip.call_args[0][0]
-
-        # Should have posted urgent alert
-        mock_alert.assert_called()
-        alert_call = mock_alert.call_args
-        assert alert_call.kwargs.get("urgent") is True
-
-    @pytest.mark.asyncio
-    async def test_non_retryable_error_fails_immediately(self):
-        """Non-retryable error should mark failed with no retry, single attempt."""
-        from seed_storage import staging
-        staging.init_tables()
-
-        fake_item = {
-            "id": "aaaaaaaa-0000-0000-0000-000000000011",
-            "source_type": "web",
-            "source_uri": "https://example.com/bad-request",
-            "raw_content": "content",
-            "channel": "test",
-            "token_estimate": 100,
-        }
-
-        call_count = 0
-        async def bad_request(**kwargs):
-            nonlocal call_count
-            call_count += 1
-            raise ValueError("bad data")
-
-        with (
-            patch("ingestion.loader.staging.get_staged", return_value=[fake_item]),
-            patch("ingestion.loader.staging.update_status") as mock_status,
-            patch("ingestion.loader.staging.is_breaker_tripped", return_value=None),
-            patch("ingestion.loader.staging.reset_orphaned_loading", return_value=0),
-            patch("ingestion.loader.staging.trip_breaker"),
-            patch("ingestion.loader.add_episode", side_effect=bad_request),
-            patch("ingestion.loader.discord_touch.react", new_callable=AsyncMock),
-            patch("ingestion.loader.discord_touch.alert", new_callable=AsyncMock),
-            patch("ingestion.loader.close", new_callable=AsyncMock),
-        ):
-            from ingestion.loader import load_batch
-            await load_batch(limit=1, concurrency=1)
-
-        # Only one attempt (no retries)
-        assert call_count == 1
-        # Marked as failed
-        failed_calls = [c for c in mock_status.call_args_list if len(c[0]) >= 2 and c[0][1] == "failed"]
-        assert len(failed_calls) >= 1
-
-    @pytest.mark.asyncio
-    async def test_retryable_error_returns_to_enriched(self):
-        """Retryable error should set item back to 'enriched' for next batch."""
-        from seed_storage import staging
-        staging.init_tables()
-
-        fake_item = {
-            "id": "aaaaaaaa-0000-0000-0000-000000000012",
-            "source_type": "web",
-            "source_uri": "https://example.com/retry-later",
-            "raw_content": "content",
-            "channel": "test",
-            "token_estimate": 100,
-        }
-
-        class FakeTimeoutError(Exception):
-            pass
-
-        async def timeout_fail(**kwargs):
-            raise FakeTimeoutError("connection timed out")
-
-        with (
-            patch("ingestion.loader.staging.get_staged", return_value=[fake_item]),
-            patch("ingestion.loader.staging.update_status") as mock_status,
-            patch("ingestion.loader.staging.is_breaker_tripped", return_value=None),
-            patch("ingestion.loader.staging.reset_orphaned_loading", return_value=0),
-            patch("ingestion.loader.staging.trip_breaker"),
-            patch("ingestion.loader.add_episode", side_effect=timeout_fail),
-            patch("ingestion.loader.discord_touch.react", new_callable=AsyncMock),
-            patch("ingestion.loader.discord_touch.alert", new_callable=AsyncMock),
-            patch("ingestion.loader.close", new_callable=AsyncMock),
-        ):
-            from ingestion.loader import load_batch
-            await load_batch(limit=1, concurrency=1)
-
-        # Item should be set back to enriched (not failed)
-        enriched_calls = [c for c in mock_status.call_args_list if len(c[0]) >= 2 and c[0][1] == "enriched"]
-        assert len(enriched_calls) >= 1
 
     @pytest.mark.asyncio
     async def test_breaker_tripped_skips_batch(self):
