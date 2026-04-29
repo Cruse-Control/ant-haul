@@ -3,7 +3,8 @@ from datetime import UTC, datetime
 from typing import Any, Literal
 
 ContentType = Literal[
-    "webpage", "youtube", "video", "image", "pdf", "github", "tweet", "instagram", "unknown"
+    "webpage", "youtube", "video", "image", "pdf", "github", "tweet", "instagram",
+    "audiobook", "unknown"
 ]
 
 _CONTENT_TYPES = {
@@ -15,6 +16,7 @@ _CONTENT_TYPES = {
     "github",
     "tweet",
     "instagram",
+    "audiobook",
     "unknown",
 }
 

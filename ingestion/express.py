@@ -144,8 +144,67 @@ async def express_ingest(
             current_status = "loaded"
             await discord_touch.react(item, "loaded")
 
+            # Post rich confirmation for audiobooks
+            if item.get("source_type") == "audible":
+                await _post_audiobook_confirmation(item)
+
     elapsed = round(time.monotonic() - t0, 1)
     return {"status": current_status, "source_uri": url, "elapsed_seconds": elapsed}
+
+
+async def _post_audiobook_confirmation(item: dict) -> None:
+    """Post a rich confirmation embed to #ant-food-audible after successful ingest."""
+    import os
+    channel_id = os.environ.get("AUDIBLE_CHANNEL_ID", "1499082920265257010")
+    if not channel_id:
+        return
+
+    meta = item.get("metadata") or {}
+    if isinstance(meta, str):
+        try:
+            meta = json.loads(meta)
+        except (json.JSONDecodeError, TypeError):
+            meta = {}
+
+    extraction = meta.get("extraction") or {}
+    concepts = extraction.get("entities", [])
+    concept_names = [e.get("name", "") for e in concepts[:5] if e.get("entity_type") in ("Concept", "concept")]
+    if not concept_names:
+        concept_names = [e.get("name", "") for e in concepts[:5] if e.get("name")]
+
+    title = meta.get("title") or item.get("source_uri", "Unknown")
+    author = meta.get("author") or "Unknown"
+    narrator = meta.get("narrator") or ""
+    duration = meta.get("duration") or ""
+    processing_path = meta.get("processing_path") or "metadata_only"
+    asin = meta.get("asin") or ""
+
+    lines = [
+        "📚 **BOOK INGESTED**",
+        "━━━━━━━━━━━━━━━━━━━━━",
+        f"**Title:** {title}",
+        f"**Author:** {author}",
+    ]
+    if narrator:
+        lines.append(f"**Narrator:** {narrator}")
+    if duration:
+        lines.append(f"**Duration:** {duration}")
+    lines.append(f"**Path:** {processing_path.replace('_', ' ').title()}")
+    if concept_names:
+        lines.append("")
+        lines.append("**Key Concepts Extracted:**")
+        for c in concept_names:
+            lines.append(f"→ {c}")
+    if asin:
+        lines.append("")
+        lines.append(f"**Graph Node:** `book::{asin.lower()}`")
+
+    await discord_touch.alert(
+        channel_id,
+        "Audiobook Ingested",
+        "\n".join(lines),
+        color=0x00A86B,  # emerald green
+    )
 
 
 if __name__ == "__main__":

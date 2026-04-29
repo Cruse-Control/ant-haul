@@ -88,6 +88,18 @@ class Settings(BaseSettings):
     TRANSCRIPTION_BACKEND: str = "whisper"  # whisper | assemblyai
     ASSEMBLYAI_API_KEY: str = ""
 
+    # --- Audible (optional — required only for DRM path) ---
+    # Audible account credentials for authentication via audible library.
+    AUDIBLE_EMAIL: str = ""
+    AUDIBLE_PASSWORD: str = ""
+    # Pre-computed activation bytes for ffmpeg DRM removal (avoids login each run).
+    # Get once via: python -c "import audible; a=audible.Client(email, password); print(a.activation_bytes)"
+    AUDIBLE_ACTIVATION_BYTES: str = ""
+    # Audible locale (us, uk, de, fr, jp, etc.). Defaults to "us".
+    AUDIBLE_LOCALE: str = "us"
+    # Destination Discord channel for ingestion confirmation posts.
+    AUDIBLE_CHANNEL_ID: str = "1499082920265257010"  # #ant-food-audible
+
     # --- GitHub (optional) ---
     GITHUB_TOKEN: str = ""
     GITHUB_TOKEN_PATH: str = ""

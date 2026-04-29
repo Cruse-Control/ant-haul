@@ -42,6 +42,7 @@ ROUTE_MAP = {
     Platform.GITHUB: 1489826423643308203,
     Platform.WEB: 1490083131921797220,
     Platform.INSTAGRAM_IMAGE: 1487648814280998963,
+    Platform.AUDIBLE: 1499082920265257010,  # #ant-food-audible
 }
 
 # Platform → emoji for routing feedback.
@@ -52,6 +53,7 @@ PLATFORM_EMOJI = {
     Platform.X_TWITTER: "\U0001f426",       # 🐦
     Platform.GITHUB: "\U0001f4e6",          # 📦
     Platform.WEB: "\U0001f310",             # 🌐
+    Platform.AUDIBLE: "\U0001f4da",           # 📚
 }
 
 DISCORD_API = "https://discord.com/api/v10"

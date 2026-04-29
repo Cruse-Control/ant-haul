@@ -23,6 +23,7 @@ from datetime import UTC, datetime
 
 from seed_storage.enrichment.models import ResolvedContent
 from seed_storage.enrichment.resolvers.base import BaseResolver
+from seed_storage.enrichment.resolvers.audible import AudibleResolver
 from seed_storage.enrichment.resolvers.fallback import FallbackResolver
 from seed_storage.enrichment.resolvers.github import GitHubResolver
 from seed_storage.enrichment.resolvers.image import ImageResolver
@@ -40,6 +41,7 @@ _DEFAULT_RESOLVERS: list[BaseResolver] = [
     TwitterResolver(),
     YouTubeResolver(),
     GitHubResolver(),
+    AudibleResolver(),
     InstagramResolver(),
     ImageResolver(),
     PDFResolver(),

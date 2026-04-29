@@ -11,6 +11,7 @@ class Platform(str, Enum):
     YOUTUBE = "youtube"
     X_TWITTER = "x_twitter"
     GITHUB = "github"
+    AUDIBLE = "audible"
     WEB = "web"
     PLAIN_TEXT = "plain_text"
     DISCORD_LINK = "discord_link"
@@ -25,6 +26,9 @@ _PATTERNS: list[tuple[re.Pattern, Platform]] = [
     (re.compile(r"https?://(www\.)?(youtube\.com/shorts/)"), Platform.YOUTUBE),
     (re.compile(r"https?://(www\.)?(x\.com|twitter\.com)/\w+/status/"), Platform.X_TWITTER),
     (re.compile(r"https?://(www\.)?github\.com/[\w\-]+/[\w\-]+"), Platform.GITHUB),
+    # Audible book URLs (audible.com product pages + shortened amzn.to links).
+    (re.compile(r"https?://(www\.)?audible\.com/pd/"), Platform.AUDIBLE),
+    (re.compile(r"https?://amzn\.to/"), Platform.AUDIBLE),
     # Discord invite/channel links — don't scrape, just capture context.
     (re.compile(r"https?://(www\.)?discord\.(com|gg)/"), Platform.DISCORD_LINK),
     # Media platforms where scraping gives garbage — capture context only.
