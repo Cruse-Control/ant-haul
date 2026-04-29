@@ -280,6 +280,9 @@ def enrich_message(self, raw_payload: dict) -> None:
         # Publish ⚙️ reaction (processing started)
         _publish_reaction(r, source_id, channel_id, "⚙️")
 
+        # Publish content-type emoji for each resolved content type (one per type).
+        _publish_content_type_reactions(r, source_id, channel_id, resolved_contents)
+
         logger.info(
             "enrich_message: enqueued source_id=%s urls=%d resolved=%d",
             source_id,
@@ -293,6 +296,35 @@ def enrich_message(self, raw_payload: dict) -> None:
             raise self.retry(exc=exc)
         except self.MaxRetriesExceededError:
             dead_letter("enrich_message", raw_payload, exc, self.request.retries)
+
+
+def _publish_content_type_reactions(
+    r: redis_lib.Redis,
+    message_id: str,
+    channel_id: str,
+    resolved_contents: "list[ResolvedContent]",
+) -> None:
+    """Publish one content-type emoji per distinct content type resolved. Never raises."""
+    # content_type → emoji
+    CONTENT_EMOJI = {
+        "youtube":    "🎬",
+        "tweet":      "🐦",
+        "github":     "📦",
+        "instagram":  "📸",
+        "webpage":    "🌐",
+        "pdf":        "📄",
+        "video":      "🎥",
+        "image":      "🖼️",
+        "audiobook":  "📚",
+        "unknown":    "❓",
+    }
+    seen: set[str] = set()
+    for rc in resolved_contents:
+        ct = rc.content_type
+        if ct in seen or ct not in CONTENT_EMOJI:
+            continue
+        seen.add(ct)
+        _publish_reaction(r, message_id, channel_id, CONTENT_EMOJI[ct])
 
 
 def _is_bot_author(author: str) -> bool:
