@@ -14,7 +14,7 @@ class RateLimiter:
     Each allowed request adds a member ``{timestamp}:{uuid4}`` with score = now.
     Members older than 60 s are pruned on every check.
 
-    Canonical key: ``seed:ratelimit:graphiti``
+    Canonical key: ``seed:ratelimit:pipeline``
     """
 
     _WINDOW_SECONDS: float = 60.0

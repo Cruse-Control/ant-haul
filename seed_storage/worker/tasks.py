@@ -90,11 +90,11 @@ def _get_cost_tracker(r: redis_lib.Redis) -> CostTracker:
 
 
 def _get_rate_limiter(r: redis_lib.Redis) -> RateLimiter:
-    return RateLimiter(r, "seed:ratelimit:graphiti", settings.RATE_LIMIT_PER_MINUTE)
+    return RateLimiter(r, "seed:ratelimit:pipeline", settings.RATE_LIMIT_PER_MINUTE)
 
 
 def _get_circuit_breaker(r: redis_lib.Redis) -> CircuitBreaker:
-    return CircuitBreaker(r, "graphiti")
+    return CircuitBreaker(r, "pipeline")
 
 
 # ---------------------------------------------------------------------------
