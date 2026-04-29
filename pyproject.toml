@@ -31,6 +31,7 @@ dependencies = [
     "docling>=2.0",
     "unstructured>=0.14",
     "openai-whisper>=20231117",
+    "youtube-transcript-api>=0.6",
 ]
 
 [project.optional-dependencies]
