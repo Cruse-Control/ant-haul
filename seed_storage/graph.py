@@ -59,6 +59,7 @@ async def init_schema():
         "CREATE CONSTRAINT fact_id IF NOT EXISTS FOR (f:Fact) REQUIRE f.id IS UNIQUE",
         "CREATE CONSTRAINT community_id IF NOT EXISTS FOR (c:__Community__) REQUIRE c.id IS UNIQUE",
         "CREATE CONSTRAINT tag_name IF NOT EXISTS FOR (t:Tag) REQUIRE t.name IS UNIQUE",
+        "CREATE CONSTRAINT query_id IF NOT EXISTS FOR (q:Query) REQUIRE q.id IS UNIQUE",
     ]
 
     vector_indexes = [
@@ -97,6 +98,8 @@ async def init_schema():
            FOR (f:Fact) ON EACH [f.statement]""",
         """CREATE FULLTEXT INDEX source_content IF NOT EXISTS
            FOR (s:Source) ON EACH [s.raw_content]""",
+        """CREATE FULLTEXT INDEX query_fulltext IF NOT EXISTS
+   FOR (q:Query) ON EACH [q.question, q.answer_md]""",
     ]
 
     async with driver.session() as session:
@@ -329,6 +332,131 @@ async def link_source_tag(source_id: str, tag_name: str):
             source_id=source_id,
             tag_name=tag_name,
         )
+
+
+async def delete_entity(*, entity_id: str) -> bool:
+    """Delete an entity and all its relationships. Returns True if node existed."""
+    driver = await get_driver()
+    async with driver.session() as session:
+        result = await session.run(
+            "MATCH (e:__Entity__ {id: $id}) WITH e, count(e) AS found "
+            "DETACH DELETE e RETURN found",
+            id=entity_id,
+        )
+        record = await result.single()
+        return bool(record and record["found"])
+
+
+async def merge_entities(*, keep_id: str, remove_id: str) -> dict:
+    """Merge remove_id into keep_id.
+    - Absorbs aliases from remove into keep
+    - Re-creates outgoing/incoming rels from remove as RELATED_TO on keep
+    - Deletes remove node
+    Returns dict with keep_id, removed_id, merged_at.
+    """
+    driver = await get_driver()
+    now = _now()
+    async with driver.session() as session:
+        await session.run(
+            """MATCH (keep:__Entity__ {id: $kid}), (remove:__Entity__ {id: $rid})
+               SET keep.aliases = [x IN (
+                   coalesce(keep.aliases, []) + [remove.name]
+                   + coalesce(remove.aliases, [])
+               ) WHERE x IS NOT NULL | x],
+               keep.updated_at = $now""",
+            kid=keep_id, rid=remove_id, now=now,
+        )
+        await session.run(
+            """MATCH (remove:__Entity__ {id: $rid})-[r]->(target)
+               WHERE target.id <> $kid AND NOT target:Source AND NOT target:Tag
+               MATCH (keep:__Entity__ {id: $kid})
+               MERGE (keep)-[nr:RELATED_TO]->(target)
+               ON CREATE SET nr.description = coalesce(r.description, ''),
+                             nr.confidence = coalesce(r.confidence, 0.7),
+                             nr.created_at = $now,
+                             nr.merged_from = $rid""",
+            rid=remove_id, kid=keep_id, now=now,
+        )
+        await session.run(
+            """MATCH (source)-[r]->(remove:__Entity__ {id: $rid})
+               WHERE source.id <> $kid AND source:__Entity__
+               MATCH (keep:__Entity__ {id: $kid})
+               MERGE (source)-[nr:RELATED_TO]->(keep)
+               ON CREATE SET nr.description = coalesce(r.description, ''),
+                             nr.confidence = coalesce(r.confidence, 0.7),
+                             nr.created_at = $now,
+                             nr.merged_from = $rid""",
+            rid=remove_id, kid=keep_id, now=now,
+        )
+        await session.run(
+            "MATCH (e:__Entity__ {id: $rid}) DETACH DELETE e",
+            rid=remove_id,
+        )
+    return {"keep_id": keep_id, "removed_id": remove_id, "merged_at": now}
+
+
+async def delete_relationship(
+    *, source_entity_id: str, target_entity_id: str, relationship_type: str
+) -> bool:
+    """Delete a specific typed relationship between two entities."""
+    driver = await get_driver()
+    if relationship_type not in ALLOWED_RELATIONSHIP_TYPES:
+        return False
+    async with driver.session() as session:
+        result = await session.run(
+            f"""MATCH (a:__Entity__ {{id: $sid}})-[r:{relationship_type}]->(b:__Entity__ {{id: $tid}})
+                DELETE r RETURN count(r) AS deleted""",
+            sid=source_entity_id, tid=target_entity_id,
+        )
+        record = await result.single()
+        return bool(record and record["deleted"] > 0)
+
+
+async def write_synthesis(*, entity_id: str, synthesis: str) -> bool:
+    """Write a long-form synthesis article (markdown) onto an entity node."""
+    driver = await get_driver()
+    now = _now()
+    async with driver.session() as session:
+        result = await session.run(
+            """MATCH (e:__Entity__ {id: $id})
+               SET e.synthesis = $synthesis, e.synthesis_updated_at = $now
+               RETURN count(e) AS updated""",
+            id=entity_id, synthesis=synthesis, now=now,
+        )
+        record = await result.single()
+        return bool(record and record["updated"] > 0)
+
+
+async def persist_query(
+    *,
+    question: str,
+    answer_md: str,
+    entity_ids: list[str] | None = None,
+    group_id: str = "ant-haul",
+) -> str:
+    """Save a query result as a Query node, linked to referenced entities via REFERENCES."""
+    driver = await get_driver()
+    query_id = _uuid()
+    now = _now()
+    async with driver.session() as session:
+        await session.run(
+            """CREATE (q:Query {
+                id: $id,
+                question: $question,
+                answer_md: $answer_md,
+                created_at: $now,
+                group_id: $group_id
+            })""",
+            id=query_id, question=question,
+            answer_md=answer_md, now=now, group_id=group_id,
+        )
+        for eid in (entity_ids or []):
+            await session.run(
+                """MATCH (q:Query {id: $qid}), (e:__Entity__ {id: $eid})
+                   MERGE (q)-[:REFERENCES]->(e)""",
+                qid=query_id, eid=eid,
+            )
+    return query_id
 
 
 # -- Read operations --
