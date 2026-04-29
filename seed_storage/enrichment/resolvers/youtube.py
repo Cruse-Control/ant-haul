@@ -50,18 +50,31 @@ def _truncate(text: str) -> str:
 
 
 def _get_transcript_api(video_id: str) -> str | None:
-    """Get transcript via youtube_transcript_api (most reliable method)."""
+    """Get transcript via youtube_transcript_api (most reliable method).
+
+    Supports both v0.x (class-method .get_transcript()) and v1.x (instance .fetch()).
+    """
     try:
         from youtube_transcript_api import YouTubeTranscriptApi
 
-        # Try English first
+        # v1.x API: instance method .fetch()
+        if hasattr(YouTubeTranscriptApi, "fetch") and not isinstance(
+            YouTubeTranscriptApi.__dict__.get("fetch"), classmethod
+        ):
+            api = YouTubeTranscriptApi()
+            try:
+                result = api.fetch(video_id)
+                return " ".join(snippet.text for snippet in result)
+            except Exception:
+                pass
+            return None
+
+        # v0.x API: class method .get_transcript()
         try:
             entries = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
             return " ".join(e["text"] for e in entries)
         except Exception:
             pass
-
-        # Fall back to any language
         try:
             entries = YouTubeTranscriptApi.get_transcript(video_id)
             return " ".join(e["text"] for e in entries)
