@@ -51,7 +51,7 @@ BOT_CONNECTED_KEY = "seed:bot:connected"
 CELERY_RAW_QUEUE = "raw_messages"
 CELERY_GRAPH_QUEUE = "graph_ingest"
 
-CHECK_TIMEOUT = 5.0  # seconds — per-check timeout (must fit within k8s liveness probe)
+CHECK_TIMEOUT = 2.0  # seconds — per-check timeout (must fit within k8s liveness probe)
 
 
 # ── Individual check functions (module-level for testability) ──────────────
@@ -100,23 +100,22 @@ def check_neo4j() -> str:
 def check_celery(r: redis_lib.Redis) -> str:
     """Check Celery worker liveness. Returns 'ok' or 'error'.
 
-    Uses the real Celery inspector when worker/app.py is available (worker-agent),
-    otherwise falls back to verifying Redis is reachable (Celery prerequisite).
+    Checks that both worker queues (raw_messages, graph_ingest) are bound
+    in Redis — this means workers are connected and consuming. This is O(1)
+    against Redis rather than a broadcast RPC via inspector.ping() which
+    takes 5+ seconds with prefork workers.
     """
-    # STUB: provided by worker-agent
     try:
-        from seed_storage.worker.app import app as celery_app  # type: ignore[import]
-
-        inspector = celery_app.control.inspect(timeout=CHECK_TIMEOUT)
-        result = inspector.ping()
-        return "ok" if result else "error"
-    except ImportError:
-        try:
-            r.ping()
+        # Celery/Kombu workers register their queues as Redis keys on startup.
+        # Check for the _kombu.binding.* keys that prove workers are subscribed.
+        raw_bound = r.exists("_kombu.binding.raw_messages")
+        graph_bound = r.exists("_kombu.binding.graph_ingest")
+        if raw_bound and graph_bound:
             return "ok"
-        except Exception as exc:
-            logger.warning("Celery prerequisite (Redis) check failed: %s", exc)
-            return "error"
+        logger.warning(
+            "Celery queues not bound: raw=%s graph=%s", raw_bound, graph_bound
+        )
+        return "error"
     except Exception as exc:
         logger.warning("Celery health check failed: %s", exc)
         return "error"
